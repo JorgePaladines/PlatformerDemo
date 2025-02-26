@@ -7,13 +7,11 @@ using System;
 public class PlayerMovement : MonoBehaviour {
     [SerializeField] float runSpeed = 5f;
     [SerializeField] float crouchSpeed = 2f;
-    [SerializeField] float jumpSpeed = 18f;
-    [SerializeField] float doubleJumpMultiplier = 0.75f;
     [SerializeField] float customGravity  = 4f;
 
     public Vector2 moveInput { get; private set; }
     Rigidbody2D rigidBody;
-    CapsuleCollider2D bodyCollider;
+    public CapsuleCollider2D bodyCollider;
     private Vector2 _originalColliderSize;
     PlayerAttack playerAttack;
     [SerializeField] float raycastDistance = 0.1f;
@@ -29,7 +27,6 @@ public class PlayerMovement : MonoBehaviour {
     #region validation properties
     public bool isGrounded = false;
     public bool isDucking = false;
-    public bool canDoubleJump = true;
     public bool isDashing = false;
     public bool isSprinting = false;
     public bool isStomping = false;
@@ -38,7 +35,6 @@ public class PlayerMovement : MonoBehaviour {
 
     #region restrictive properties
     private bool canMove = true;
-    private bool canJump = true;
     public bool canAttack = true;
     private bool canDuck = true;
     private bool canDash = true;
@@ -68,9 +64,11 @@ public class PlayerMovement : MonoBehaviour {
     private float _currentHorizontalVelocity;  // Track current velocity separately
     #endregion
 
-    public event EventHandler OnDoubleJump;
+    public event EventHandler Landed;
     public event EventHandler OnStartDash;
+    public event EventHandler OnEndDash;
     public event EventHandler OnStartStomp;
+    public event EventHandler OnEndStomp;
 
 
     void Start()  {
@@ -175,29 +173,6 @@ public class PlayerMovement : MonoBehaviour {
         _playerDirection = Math.Sign(moveInput.x) >= 0 ? 1 : -1;
     }
 
-    public void OnJump (InputAction.CallbackContext context) {
-        if(!canJump) return;
-        
-        if (context.started) {
-            if(isGrounded){
-                rigidBody.velocity += new Vector2(0f, jumpSpeed);
-            }
-            else if(canDoubleJump){
-                canDoubleJump = false;
-                OnDoubleJump?.Invoke(this, EventArgs.Empty);
-                rigidBody.velocity = new Vector2(rigidBody.velocity.x, 0f); // Reset Y velocity to avoid stacking force
-                rigidBody.velocity += new Vector2(0f, jumpSpeed * doubleJumpMultiplier);
-            }
-
-            // RhythmManager.Instance.RegisterAction(false);
-        }
-        else if (context.canceled) {
-            if (rigidBody.velocity.y > 0) {
-                rigidBody.velocity *= new Vector2(1f, 0.5f);
-            }
-        }
-    }
-
     private void CheckGrounded(){
         RaycastHit2D groundRayCast = Physics2D.CapsuleCast(
             bodyCollider.bounds.center, 
@@ -210,8 +185,8 @@ public class PlayerMovement : MonoBehaviour {
         );
 
         if(groundRayCast.collider){
+            Landed?.Invoke(this, EventArgs.Empty);
             isGrounded = true;
-            canDoubleJump = true;
             canDash = true;
 
             if (isStomping) {
@@ -230,7 +205,7 @@ public class PlayerMovement : MonoBehaviour {
     }
     
     private void Ducking() {
-        if (!canDuck && !isDashing && !isSprinting) return;
+        if (!canDuck && !isSprinting && !isDashing) return;
 
         if (!isGrounded) {
             isDucking = false;
@@ -332,17 +307,19 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void StartStomp() {
+        OnStartStomp?.Invoke(this, EventArgs.Empty);
+
         isStomping = true;
-        canJump = false;
         canAttack = false;
         canDash = false;
         rigidBody.velocity = Vector2.zero; // Reset velocity before stomp
-        OnStartStomp?.Invoke(this, EventArgs.Empty);
     }
+
     private void EndStomp() {
+        OnEndStomp?.Invoke(this, EventArgs.Empty);
+
         isStomping = false;
         canMove = true;
-        canJump = true;
         canAttack = true;
         canDash = true;
         keepSprintingState = true; // Enable sprinting after stomp

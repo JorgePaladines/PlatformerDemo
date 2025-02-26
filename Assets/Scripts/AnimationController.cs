@@ -6,15 +6,16 @@ using System;
 public class AnimationController : MonoBehaviour
 {
     PlayerMovement playerController;
+    JumpAbility jumpAbility;
     Animator animator;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         playerController = GetComponent<PlayerMovement>();
         animator = GetComponentInChildren<Animator>();
+        jumpAbility = GetComponent<JumpAbility>();
 
-        playerController.OnDoubleJump += PlayDoubleJump;
+        jumpAbility.OnDoubleJump += PlayDoubleJump;
         playerController.OnStartDash += PlayDash;
         playerController.OnStartStomp += PlayStomp;
     }
@@ -38,5 +39,4 @@ public class AnimationController : MonoBehaviour
     void PlayStomp (object sender, EventArgs e) {
         animator.Play("stomp");
     }
-
 }
