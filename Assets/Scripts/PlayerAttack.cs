@@ -24,7 +24,8 @@ public class PlayerAttack : MonoBehaviour {
         jumpAbility.Jumped += CancelAttack;
     }
 
-    public void OnAttack(InputAction.CallbackContext context) { // Call this when the attack button is pressed
+    public void OnAttack(InputAction.CallbackContext context) {
+        if (player == null || attackBox == null) return;
         if (context.started && attackEnabled) {
             StartCoroutine(nameof(Attack));
         }
@@ -41,12 +42,12 @@ public class PlayerAttack : MonoBehaviour {
         return attackEnabled;
     }
 
-    public void EnableAttack(){
-        attackEnabled = true;
+    public bool EnableAttack(){
+        return attackEnabled = true;
     }
 
-    public void DisableAttack(){
-        attackEnabled = false;
+    public bool DisableAttack(){
+        return attackEnabled = false;
     }
 
     // Cancel attack if the player hit the ground or just jumped

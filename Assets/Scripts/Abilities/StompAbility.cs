@@ -9,6 +9,7 @@ public class StompAbility : MonoBehaviour {
     public bool isStomping = false;
     [SerializeField] float stompSpeed = 23f; // Speed of downward stomp
     [SerializeField] float stompHorizontalSpeed = 2f; // Limited horizontal movement during stomp
+    
     // [SerializeField] Vector2 stompHitboxSize = new Vector2(0.5f, 0.5f); // Size of stomp hitbox
     [SerializeField] LayerMask enemyLayerMask; // Layer for enemies to detect
 
@@ -36,11 +37,6 @@ public class StompAbility : MonoBehaviour {
         dashAbility.OnEndDash += EnableStomp;
     }
 
-    // Update is called once per frame
-    void Update() {
-        
-    }
-
     public void EnableStomp(object sender = null, EventArgs e = null) {
         canStomp = true;
     }
@@ -51,8 +47,9 @@ public class StompAbility : MonoBehaviour {
 
     public void OnStomp (InputAction.CallbackContext context) {
         if(!canStomp) return;
+        if (player == null) return;
         if (context.started) {
-            bool isDashing = dashAbility != null && dashAbility.isDashing;
+            bool isDashing = dashAbility?.isDashing ?? false;
             if(!isDashing && canStomp && !player.isGrounded && player.moveInput.y < 0 && !isStomping){
                 StartStomp();
             }
@@ -84,9 +81,9 @@ public class StompAbility : MonoBehaviour {
         if(dashAbility != null){
             dashAbility.EnableDash();
 
-            // Instantly set velocity to dashSpeed if moving
+            // Instantly trigger a dash if moving
             if (Math.Abs(player.moveInput.x) >= 1) {
-                dashAbility.TiggerDash();
+                dashAbility.TriggerDash();
             } else {
                 // Reset if no input
                 player.SetExternalSpeed(0f);

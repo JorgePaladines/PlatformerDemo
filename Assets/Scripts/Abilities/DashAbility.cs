@@ -15,7 +15,7 @@ public class DashAbility : MonoBehaviour {
     public bool keepSprintingState { get; private set; }
     private float _dashTimer;
 
-    public float dashSpeed { get; private set; }
+    [SerializeField] float dashSpeed = 15f;
     private float dashTime = 0.1f;
     private float dashCooldownTime = 0.25f;
     
@@ -29,8 +29,6 @@ public class DashAbility : MonoBehaviour {
     }
     
     void Start() {
-        dashSpeed = 15f;
-
         canDash = true;
         isDashing = false;
 
@@ -53,12 +51,16 @@ public class DashAbility : MonoBehaviour {
     public void OnDash (InputAction.CallbackContext context) {
         if(!canDash) return;
         if (context.started) {
-            TiggerDash();
+            TriggerDash();
         }
     }
 
-    public void TiggerDash() {
-        if (player.moveInput.y >= 0 && _dashTimer <= 0) {
+    public void TriggerDash() {
+        if (player == null) return;
+        bool airDash = canDash && !player.isGrounded && player.moveInput.y >= 0;
+        bool groundDash = canDash && (player.isGrounded || player.isDucking);
+        bool ableToDash = airDash || groundDash;
+        if (ableToDash && _dashTimer <= 0) {
             StartCoroutine(Dash());
         }
     }
