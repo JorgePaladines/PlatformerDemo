@@ -2,23 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class PlayerAttack : MonoBehaviour {
     private bool attackEnabled;
     public Transform attackPoint; // The position where the hitbox will be spawned
     private PlayerMovement player;
+    private JumpAbility jumpAbility;
 
     [SerializeField] GameObject attackBox;
     [SerializeField] float duration = 0.3f;
     
     private void Start(){
-        player = FindObjectOfType<PlayerMovement>();
+        player = GetComponent<PlayerMovement>();
+        jumpAbility = GetComponent<JumpAbility>();
+
         attackBox.SetActive(false);
         attackEnabled = true;
-    }
 
-    public bool canAttack(){
-        return attackEnabled;
+        player.Landed += CancelAttack;
+        jumpAbility.Jumped += CancelAttack;
     }
 
     public void OnAttack(InputAction.CallbackContext context) { // Call this when the attack button is pressed
@@ -34,8 +37,8 @@ public class PlayerAttack : MonoBehaviour {
         attackBox.SetActive(false);
     }
 
-    public void CancelAttack(){
-        attackBox.SetActive(false);
+    public bool canAttack(){
+        return attackEnabled;
     }
 
     public void EnableAttack(){
@@ -44,5 +47,12 @@ public class PlayerAttack : MonoBehaviour {
 
     public void DisableAttack(){
         attackEnabled = false;
+    }
+
+    // Cancel attack if the player hit the ground or just jumped
+    public void CancelAttack(object sender = null, EventArgs e = null){
+        Debug.Log(sender);
+        Debug.Log(e);
+        attackBox.SetActive(false);
     }
 }

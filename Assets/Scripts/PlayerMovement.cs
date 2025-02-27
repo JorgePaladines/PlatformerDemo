@@ -14,7 +14,6 @@ public class PlayerMovement : MonoBehaviour {
     Rigidbody2D rigidBody;
     public CapsuleCollider2D bodyCollider { get; private set; }
     private Vector2 _originalColliderSize;
-    PlayerAttack playerAttack;
     [SerializeField] float raycastDistance = 0.1f;
     [SerializeField] LayerMask layerMask;
     // [SerializeField] float slopeAngleLimit = 45f;
@@ -29,8 +28,7 @@ public class PlayerMovement : MonoBehaviour {
     public bool isGrounded;
     public bool isDucking;
     public bool keepDucking;
-    public bool isStomping = false;
-    private bool _inAirLastFrame;
+    public bool _inAirLastFrame;
     #endregion
 
     #region restrictive properties
@@ -40,6 +38,7 @@ public class PlayerMovement : MonoBehaviour {
     #endregion
 
     #region Stomp Variables
+    public bool isStomping = false;
     [SerializeField] float stompSpeed = 23f; // Speed of downward stomp
     [SerializeField] float stompHorizontalSpeed = 2f; // Limited horizontal movement during stomp
     // [SerializeField] Vector2 stompHitboxSize = new Vector2(0.5f, 0.5f); // Size of stomp hitbox
@@ -62,11 +61,11 @@ public class PlayerMovement : MonoBehaviour {
     void Start()  {
         rigidBody = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<CapsuleCollider2D>();
-        playerAttack = GetComponent<PlayerAttack>();
 
         rigidBody.gravityScale = customGravity;
         _originalColliderSize = bodyCollider.size;
 
+        canMove = true;
         isGrounded = false;
         isDucking = false;
         keepDucking = false;
@@ -191,8 +190,9 @@ public class PlayerMovement : MonoBehaviour {
         );
 
         if(groundRayCast.collider){
-            Landed?.Invoke(this, EventArgs.Empty);
             isGrounded = true;
+
+            if(isGrounded && _inAirLastFrame) Landed?.Invoke(this, EventArgs.Empty);
 
             if (isStomping) {
                 EndStomp();
@@ -201,11 +201,6 @@ public class PlayerMovement : MonoBehaviour {
         }
         else{
             isGrounded = false;
-        }
-
-        // Cancel attack if the player hit the ground or just jumped
-        if ((isGrounded && _inAirLastFrame) || (!isGrounded && !_inAirLastFrame)) {
-            playerAttack.CancelAttack();
         }
     }
     
@@ -265,7 +260,7 @@ public class PlayerMovement : MonoBehaviour {
         OnStartStomp?.Invoke(this, EventArgs.Empty);
 
         isStomping = true;
-        playerAttack.DisableAttack();
+        // playerAttack.DisableAttack();
         // canDash = false;
         rigidBody.velocity = Vector2.zero; // Reset velocity before stomp
     }
@@ -275,7 +270,7 @@ public class PlayerMovement : MonoBehaviour {
 
         isStomping = false;
         canMove = true;
-        playerAttack.EnableAttack();
+        // playerAttack.EnableAttack();
         // canDash = true;
         // keepSprintingState = true; // Enable sprinting after stomp
 
