@@ -7,6 +7,7 @@ public class AnimationController : MonoBehaviour
 {
     PlayerMovement playerController;
     JumpAbility jumpAbility;
+    DashAbility dashAbility;
     Animator animator;
 
     // Start is called before the first frame update
@@ -14,9 +15,10 @@ public class AnimationController : MonoBehaviour
         playerController = GetComponent<PlayerMovement>();
         animator = GetComponentInChildren<Animator>();
         jumpAbility = GetComponent<JumpAbility>();
+        dashAbility = GetComponent<DashAbility>();
 
         jumpAbility.OnDoubleJump += PlayDoubleJump;
-        playerController.OnStartDash += PlayDash;
+        dashAbility.OnStartDash += PlayDash;
         playerController.OnStartStomp += PlayStomp;
     }
 

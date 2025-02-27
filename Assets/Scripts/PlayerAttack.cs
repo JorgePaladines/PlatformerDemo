@@ -4,28 +4,26 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerAttack : MonoBehaviour {
+    private bool attackEnabled;
     public Transform attackPoint; // The position where the hitbox will be spawned
-    private GameObject currentHitbox; // Store reference to active hitbox
-    private PlayerMovement playerMovement;
+    private PlayerMovement player;
 
     [SerializeField] GameObject attackBox;
     [SerializeField] float duration = 0.3f;
     
     private void Start(){
-        playerMovement = FindObjectOfType<PlayerMovement>();
+        player = FindObjectOfType<PlayerMovement>();
         attackBox.SetActive(false);
+        attackEnabled = true;
+    }
+
+    public bool canAttack(){
+        return attackEnabled;
     }
 
     public void OnAttack(InputAction.CallbackContext context) { // Call this when the attack button is pressed
-        if (context.started && playerMovement.canAttack) {
+        if (context.started && attackEnabled) {
             StartCoroutine(nameof(Attack));
-
-            // if (currentHitbox == null) { // Prevent multiple hitboxes at once
-            //     currentHitbox = Instantiate(attackBox, attackPoint.position, Quaternion.identity);
-            //     RhythmManager.Instance.RegisterAction(true);
-            //     currentHitbox.transform.SetParent(transform); // Parent to the player
-            //     Destroy(currentHitbox, duration);
-            // }
         }
     }
 
@@ -37,7 +35,14 @@ public class PlayerAttack : MonoBehaviour {
     }
 
     public void CancelAttack(){
-        // Destroy(currentHitbox);
         attackBox.SetActive(false);
+    }
+
+    public void EnableAttack(){
+        attackEnabled = true;
+    }
+
+    public void DisableAttack(){
+        attackEnabled = false;
     }
 }

@@ -5,9 +5,11 @@ using UnityEngine.InputSystem;
 using System;
 
 public class JumpAbility : MonoBehaviour {
+    [Header("Player Components")]
     PlayerMovement player;
     Rigidbody2D rigidBody;
 
+    [Header("Jump Settings")]
     [SerializeField] float jumpSpeed = 18f;
     [SerializeField] float doubleJumpMultiplier = 0.75f;
     public bool canJump = true;
@@ -50,8 +52,6 @@ public class JumpAbility : MonoBehaviour {
             }
         }
     }
-
-
 
     public void EnableJump(object sender = null, EventArgs e = null) {
         canJump = true;

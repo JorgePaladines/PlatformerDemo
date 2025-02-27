@@ -7,11 +7,12 @@ using System;
 public class PlayerMovement : MonoBehaviour {
     [SerializeField] float runSpeed = 5f;
     [SerializeField] float crouchSpeed = 2f;
+    public float externalSpeed { get; private set; }
     [SerializeField] float customGravity  = 4f;
 
     public Vector2 moveInput { get; private set; }
     Rigidbody2D rigidBody;
-    public CapsuleCollider2D bodyCollider;
+    public CapsuleCollider2D bodyCollider { get; private set; }
     private Vector2 _originalColliderSize;
     PlayerAttack playerAttack;
     [SerializeField] float raycastDistance = 0.1f;
@@ -19,34 +20,23 @@ public class PlayerMovement : MonoBehaviour {
     // [SerializeField] float slopeAngleLimit = 45f;
     // [SerializeField] float downForceAdjustment = 1.2f;
 
+    #region validation properties
     public float horizontalMovementValue;
     public float verticalMovementValue;
-    private int _facingDirection = 1; // Direction the playable character faces
-    private int _playerDirection; // Direction the player is trying to go to
-
-    #region validation properties
-    public bool isGrounded = false;
-    public bool isDucking = false;
-    public bool isDashing = false;
-    public bool isSprinting = false;
+    public int facingDirection; // Direction the playable character faces
+    public int playerDirection; // Direction the player is trying to go to
+    public bool tryingToTurn;
+    public bool isGrounded;
+    public bool isDucking;
+    public bool keepDucking;
     public bool isStomping = false;
     private bool _inAirLastFrame;
     #endregion
 
     #region restrictive properties
-    private bool canMove = true;
-    public bool canAttack = true;
-    private bool canDuck = true;
-    private bool canDash = true;
-    private bool canStomp = true;
-    #endregion
-
-    #region Dash Variables
-    [SerializeField] float dashSpeed = 15f;
-    [SerializeField] float dashTime = 0.1f;
-    [SerializeField] float dashCooldownTime = 0.25f;
-    private float _dashTimer;
-    private bool keepSprintingState;
+    public bool canMove;
+    public bool canDuck;
+    public bool canStomp = true;
     #endregion
 
     #region Stomp Variables
@@ -60,13 +50,11 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField] float normalDeceleration = 15f;     // Rate of normal slowing
     [SerializeField] float sharpDeceleration = 40f;      // Rate when changing directions
     [SerializeField] float minVelocityThreshold = 0.1f;  // When to snap to zero
-    [SerializeField] float minTurnThreshold = 2f; // Minimum speed below which turning is allowed
+    [SerializeField] public float minTurnThreshold = 2f; // Minimum speed below which turning is allowed
     private float _currentHorizontalVelocity;  // Track current velocity separately
     #endregion
 
     public event EventHandler Landed;
-    public event EventHandler OnStartDash;
-    public event EventHandler OnEndDash;
     public event EventHandler OnStartStomp;
     public event EventHandler OnEndStomp;
 
@@ -78,6 +66,12 @@ public class PlayerMovement : MonoBehaviour {
 
         rigidBody.gravityScale = customGravity;
         _originalColliderSize = bodyCollider.size;
+
+        isGrounded = false;
+        isDucking = false;
+        keepDucking = false;
+        externalSpeed = 0f;
+        facingDirection = 1;
     }
 
     void Update() {
@@ -85,7 +79,6 @@ public class PlayerMovement : MonoBehaviour {
         CheckDirection();
         CheckGrounded();
         Ducking();
-        ConsumeDashTime();
 
         horizontalMovementValue = rigidBody.velocity.x;
         verticalMovementValue = rigidBody.velocity.y;
@@ -96,6 +89,42 @@ public class PlayerMovement : MonoBehaviour {
         moveInput = context.ReadValue<Vector2>();
     }
 
+    public float GetHorizontalVelocity(){
+        return _currentHorizontalVelocity;
+    }
+
+    public void SetHorizontalVelocity(float velocity){
+        _currentHorizontalVelocity = velocity;
+    }
+
+    public void DisableMove(){
+        canMove = false;
+    }
+
+    public void EnableMove(){
+        canMove = true;
+    }
+
+    public void DisableDuck(){
+        canDuck = false;
+    }
+
+    public void EnableDuck(){
+        canDuck = true;
+    }
+
+    public void SetExternalSpeed(float speed){
+        externalSpeed = speed;
+    }
+
+    public void DisableGravity(){
+        rigidBody.gravityScale = 0;
+    }
+
+    public void EnableGravity(){
+        rigidBody.gravityScale = customGravity;
+    }
+
     private void Run() {
         if (!canMove) return;
 
@@ -104,50 +133,27 @@ public class PlayerMovement : MonoBehaviour {
             rigidBody.velocity = stompVelocity;
         }
         else {
-            // Check if player should be sprinting (post-dash or post-stomp)
-            isSprinting = keepSprintingState && !isDucking && Math.Abs(moveInput.x) >= 1;
-            float targetVelocity;
-
             // Determine target velocity
-            if (isSprinting) {
-                targetVelocity = moveInput.x * dashSpeed; // Maintain dash speed during sprint
+            float targetVelocity;
+            if (Math.Abs(externalSpeed) > 0) {
+                targetVelocity = moveInput.x * externalSpeed; // Maintain external speed
             }
             else if (isDucking) {
                 targetVelocity = moveInput.x * crouchSpeed;
-                if (keepSprintingState && isDucking) keepSprintingState = false; // Reset sprint only if ducking during sprint
-            } 
+            }
             else {
-                targetVelocity = moveInput.x * runSpeed; // Normal run speed otherwise
-                keepSprintingState = false; // Reset sprint state if not sprinting and moving normally
+                targetVelocity = moveInput.x * runSpeed;
             }
 
             // Calculate deceleration rate
-            float decelerationRate = normalDeceleration;
-            if (moveInput.x != 0 && Mathf.Sign(moveInput.x) != Mathf.Sign(_currentHorizontalVelocity)) {
-                decelerationRate = sharpDeceleration; // Sharper deceleration on direction change
-            }
+            tryingToTurn = moveInput.x != 0 && Mathf.Sign(moveInput.x) != Mathf.Sign(_currentHorizontalVelocity);
+            float decelerationRate = tryingToTurn ? sharpDeceleration : normalDeceleration;
 
-            // Prevent instant direction change when moving at high speed (unless dashing)
-            bool isMovingFast = Mathf.Abs(_currentHorizontalVelocity) > minTurnThreshold;
-            bool tryingToTurn = moveInput.x != 0 && Mathf.Sign(moveInput.x) != Mathf.Sign(_currentHorizontalVelocity);
-
-            if (isMovingFast && tryingToTurn && !isDashing) { // Dash can bypass this
-                // Decelerate to zero instead of flipping direction
-                _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, 0f, sharpDeceleration * Time.deltaTime);
-                keepSprintingState = false; // End sprint state during turn attempt
-            }
-            else if (!isSprinting || moveInput.x == 0) {
-                // Smoothly interpolate velocity unless sprinting and moving in same direction
+            if(Math.Abs(moveInput.x) != 0){
                 _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, targetVelocity, decelerationRate * Time.deltaTime);
             }
             else {
-                // If sprinting and moving, maintain dashSpeed instantly in direction
-                _currentHorizontalVelocity = targetVelocity;
-            }
-
-            // Interrupt sprinting if input stops
-            if (isSprinting && moveInput.x == 0) {
-                keepSprintingState = false; // End sprint state on stop
+                _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, 0f, decelerationRate * Time.deltaTime);
             }
 
             // Snap to zero when very close and no input
@@ -155,7 +161,7 @@ public class PlayerMovement : MonoBehaviour {
                 _currentHorizontalVelocity = 0f;
             }
 
-            // Apply the velocity (can be overridden by dash or ducking stop)
+            // Apply the velocity
             rigidBody.velocity = new Vector2(_currentHorizontalVelocity, rigidBody.velocity.y);
         }
     }
@@ -163,14 +169,14 @@ public class PlayerMovement : MonoBehaviour {
     private void CheckDirection() {
         if (rigidBody.velocity.x < 0) {
             transform.rotation = Quaternion.Euler(0f, 180f, 0f);
-            _facingDirection = -1;
+            facingDirection = -1;
         }
         else if (rigidBody.velocity.x > 0) {
             transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-            _facingDirection = 1;
+            facingDirection = 1;
         }
 
-        _playerDirection = Math.Sign(moveInput.x) >= 0 ? 1 : -1;
+        playerDirection = Math.Sign(moveInput.x) >= 0 ? 1 : -1;
     }
 
     private void CheckGrounded(){
@@ -187,7 +193,6 @@ public class PlayerMovement : MonoBehaviour {
         if(groundRayCast.collider){
             Landed?.Invoke(this, EventArgs.Empty);
             isGrounded = true;
-            canDash = true;
 
             if (isStomping) {
                 EndStomp();
@@ -205,7 +210,7 @@ public class PlayerMovement : MonoBehaviour {
     }
     
     private void Ducking() {
-        if (!canDuck && !isSprinting && !isDashing) return;
+        if (!canDuck) return;
 
         if (!isGrounded) {
             isDucking = false;
@@ -214,7 +219,7 @@ public class PlayerMovement : MonoBehaviour {
                 bodyCollider.offset = new Vector2(0f, 0f);
             }
         }
-        else if (moveInput.y < 0 && Math.Abs(_currentHorizontalVelocity) <= crouchSpeed && isGrounded && !isDucking && !isDashing && !isSprinting) {
+        else if (moveInput.y < 0 && Math.Abs(_currentHorizontalVelocity) <= crouchSpeed && isGrounded && !isDucking) {
             bodyCollider.size = new Vector2(bodyCollider.size.x, bodyCollider.size.y / 2);
             bodyCollider.offset = new Vector2(0f, -bodyCollider.size.y / 2);
             isDucking = true;
@@ -240,7 +245,7 @@ public class PlayerMovement : MonoBehaviour {
                 layerMask
             );
 
-            if (!hitCeilingHigh.collider && !hitCeilingLow.collider && !isDashing) {
+            if (!hitCeilingHigh.collider && !hitCeilingLow.collider && !keepDucking) {
                 bodyCollider.size = _originalColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);
                 isDucking = false;
@@ -248,70 +253,20 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    public void OnDash (InputAction.CallbackContext context) {
-        if(!canDash && !canStomp) return;
-
-        if (context.started) {
-            if(canStomp && !isGrounded && !isStomping && !isDashing && moveInput.y < 0){
-                StartStomp();
-            }
-            else{
-                if(canDash && !isStomping && !isDashing && _dashTimer <= 0){
-                    StartCoroutine(nameof(Dash));
-                    if(Math.Abs(rigidBody.velocity.x) < dashSpeed){
-                        int directionToDash = moveInput.x == 0 ? _facingDirection : _playerDirection;
-                        _currentHorizontalVelocity = dashSpeed * directionToDash;
-                        rigidBody.velocity = new Vector2(_currentHorizontalVelocity, 0f);
-                    }
-                }
-            }
-        }
+    public void ForceKeepDucking(bool value) {
+        keepDucking = value;
     }
 
-    private void ConsumeDashTime() {
-        if (_dashTimer > 0) _dashTimer -= Time.deltaTime;
-    }
-    
-    IEnumerator Dash() {
-        // Avoid multiple air dashes
-        if (!isGrounded) canDash = false;
-
-        rigidBody.gravityScale = 0;
-        _dashTimer = dashCooldownTime + dashTime; // Set cooldown immediately
-        canMove = false;
-        canAttack = false;
-        canDuck = false;
-        canStomp = false;
-        isDashing = true;
-        keepSprintingState = true; // Enable sprinting after dash ends
-
-        OnStartDash?.Invoke(this, EventArgs.Empty);
-        yield return new WaitForSeconds(dashTime);
-
-        rigidBody.gravityScale = customGravity;
-        isDashing = false;
-
-        // Check if ducking when dash ends and stop immediately
-        if (isDucking) {
-            _currentHorizontalVelocity = 0f; // Stop immediately
-            rigidBody.velocity = new Vector2(0f, rigidBody.velocity.y);
-            keepSprintingState = false; // Prevent sprinting from resuming
-        }
-
-        canMove = true;
-        canAttack = true;
-        canDuck = true;
-        canStomp = true;
-
-        yield return new WaitForSeconds(dashCooldownTime); // Wait for cooldown
+    public void ForceTurning(bool value) {
+        tryingToTurn = value;
     }
 
-    private void StartStomp() {
+    public void StartStomp() {
         OnStartStomp?.Invoke(this, EventArgs.Empty);
 
         isStomping = true;
-        canAttack = false;
-        canDash = false;
+        playerAttack.DisableAttack();
+        // canDash = false;
         rigidBody.velocity = Vector2.zero; // Reset velocity before stomp
     }
 
@@ -320,13 +275,13 @@ public class PlayerMovement : MonoBehaviour {
 
         isStomping = false;
         canMove = true;
-        canAttack = true;
-        canDash = true;
-        keepSprintingState = true; // Enable sprinting after stomp
+        playerAttack.EnableAttack();
+        // canDash = true;
+        // keepSprintingState = true; // Enable sprinting after stomp
 
         // Instantly set velocity to dashSpeed if moving
         if (Math.Abs(moveInput.x) >= 1) {
-            _currentHorizontalVelocity = moveInput.x * dashSpeed;
+            _currentHorizontalVelocity = moveInput.x * externalSpeed;
         } else {
             _currentHorizontalVelocity = 0f; // Reset if no input
         }
