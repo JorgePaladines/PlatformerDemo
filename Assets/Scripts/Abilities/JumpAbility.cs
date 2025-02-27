@@ -25,8 +25,6 @@ public class JumpAbility : MonoBehaviour {
 
     void Start() {
         player.Landed += EnableDoubleJump;
-        player.OnStartStomp += DisableJump;
-        player.OnEndStomp += EnableJump;
     }
 
     public void OnJump(InputAction.CallbackContext context) {

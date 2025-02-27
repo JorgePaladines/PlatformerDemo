@@ -34,15 +34,6 @@ public class PlayerMovement : MonoBehaviour {
     #region restrictive properties
     public bool canMove;
     public bool canDuck;
-    public bool canStomp = true;
-    #endregion
-
-    #region Stomp Variables
-    public bool isStomping = false;
-    [SerializeField] float stompSpeed = 23f; // Speed of downward stomp
-    [SerializeField] float stompHorizontalSpeed = 2f; // Limited horizontal movement during stomp
-    // [SerializeField] Vector2 stompHitboxSize = new Vector2(0.5f, 0.5f); // Size of stomp hitbox
-    [SerializeField] LayerMask enemyLayerMask; // Layer for enemies to detect
     #endregion
 
     #region deceleration variables
@@ -54,9 +45,6 @@ public class PlayerMovement : MonoBehaviour {
     #endregion
 
     public event EventHandler Landed;
-    public event EventHandler OnStartStomp;
-    public event EventHandler OnEndStomp;
-
 
     void Start()  {
         rigidBody = GetComponent<Rigidbody2D>();
@@ -127,42 +115,36 @@ public class PlayerMovement : MonoBehaviour {
     private void Run() {
         if (!canMove) return;
 
-        if (isStomping) {
-            Vector2 stompVelocity = new Vector2(moveInput.x * stompHorizontalSpeed, -stompSpeed);
-            rigidBody.velocity = stompVelocity;
+        // Determine target velocity
+        float targetVelocity;
+        if (Math.Abs(externalSpeed) > 0) {
+            targetVelocity = moveInput.x * externalSpeed; // Maintain external speed
+        }
+        else if (isDucking) {
+            targetVelocity = moveInput.x * crouchSpeed;
         }
         else {
-            // Determine target velocity
-            float targetVelocity;
-            if (Math.Abs(externalSpeed) > 0) {
-                targetVelocity = moveInput.x * externalSpeed; // Maintain external speed
-            }
-            else if (isDucking) {
-                targetVelocity = moveInput.x * crouchSpeed;
-            }
-            else {
-                targetVelocity = moveInput.x * runSpeed;
-            }
-
-            // Calculate deceleration rate
-            tryingToTurn = moveInput.x != 0 && Mathf.Sign(moveInput.x) != Mathf.Sign(_currentHorizontalVelocity);
-            float decelerationRate = tryingToTurn ? sharpDeceleration : normalDeceleration;
-
-            if(Math.Abs(moveInput.x) != 0){
-                _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, targetVelocity, decelerationRate * Time.deltaTime);
-            }
-            else {
-                _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, 0f, decelerationRate * Time.deltaTime);
-            }
-
-            // Snap to zero when very close and no input
-            if (Mathf.Abs(_currentHorizontalVelocity) < minVelocityThreshold && targetVelocity == 0) {
-                _currentHorizontalVelocity = 0f;
-            }
-
-            // Apply the velocity
-            rigidBody.velocity = new Vector2(_currentHorizontalVelocity, rigidBody.velocity.y);
+            targetVelocity = moveInput.x * runSpeed;
         }
+
+        // Calculate deceleration rate
+        tryingToTurn = moveInput.x != 0 && Mathf.Sign(moveInput.x) != Mathf.Sign(_currentHorizontalVelocity);
+        float decelerationRate = tryingToTurn ? sharpDeceleration : normalDeceleration;
+
+        if(Math.Abs(moveInput.x) != 0){
+            _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, targetVelocity, decelerationRate * Time.deltaTime);
+        }
+        else {
+            _currentHorizontalVelocity = Mathf.MoveTowards(_currentHorizontalVelocity, 0f, decelerationRate * Time.deltaTime);
+        }
+
+        // Snap to zero when very close and no input
+        if (Mathf.Abs(_currentHorizontalVelocity) < minVelocityThreshold && targetVelocity == 0) {
+            _currentHorizontalVelocity = 0f;
+        }
+
+        // Apply the velocity
+        rigidBody.velocity = new Vector2(_currentHorizontalVelocity, rigidBody.velocity.y);
     }
 
     private void CheckDirection() {
@@ -193,11 +175,6 @@ public class PlayerMovement : MonoBehaviour {
             isGrounded = true;
 
             if(isGrounded && _inAirLastFrame) Landed?.Invoke(this, EventArgs.Empty);
-
-            if (isStomping) {
-                EndStomp();
-                // CheckStompHit();
-            }
         }
         else{
             isGrounded = false;
@@ -255,44 +232,4 @@ public class PlayerMovement : MonoBehaviour {
     public void ForceTurning(bool value) {
         tryingToTurn = value;
     }
-
-    public void StartStomp() {
-        OnStartStomp?.Invoke(this, EventArgs.Empty);
-
-        isStomping = true;
-        // playerAttack.DisableAttack();
-        // canDash = false;
-        rigidBody.velocity = Vector2.zero; // Reset velocity before stomp
-    }
-
-    private void EndStomp() {
-        OnEndStomp?.Invoke(this, EventArgs.Empty);
-
-        isStomping = false;
-        canMove = true;
-        // playerAttack.EnableAttack();
-        // canDash = true;
-        // keepSprintingState = true; // Enable sprinting after stomp
-
-        // Instantly set velocity to dashSpeed if moving
-        if (Math.Abs(moveInput.x) >= 1) {
-            _currentHorizontalVelocity = moveInput.x * externalSpeed;
-        } else {
-            _currentHorizontalVelocity = 0f; // Reset if no input
-        }
-
-        rigidBody.velocity = new Vector2(_currentHorizontalVelocity, 0f); // Apply immediately
-    }
-
-    // Check for enemy hits
-    // private void CheckStompHit() {
-    //     Vector2 hitboxCenter = (Vector2)transform.position + Vector2.down * bodyCollider.size.y / 2;
-    //     Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, stompHitboxSize, 0f, enemyLayerMask);
-        
-    //     foreach (Collider2D hit in hits) {
-    //         // Here you can add damage logic
-    //         // For example: hit.GetComponent<Enemy>().TakeDamage(stompDamage);
-    //         Debug.Log($"Stomped on: {hit.gameObject.name}");
-    //     }
-    // }
 }

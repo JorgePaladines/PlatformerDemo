@@ -12,12 +12,12 @@ public class DashAbility : MonoBehaviour {
     public bool canDash { get; private set; }
     public bool isDashing { get; private set; }
     public bool isSprinting { get; private set; }
-    public bool keepSprintingState;
+    public bool keepSprintingState { get; private set; }
     private float _dashTimer;
 
-    [SerializeField] float dashSpeed = 15f;
-    [SerializeField] float dashTime = 0.1f;
-    [SerializeField] float dashCooldownTime = 0.25f;
+    public float dashSpeed { get; private set; }
+    private float dashTime = 0.1f;
+    private float dashCooldownTime = 0.25f;
     
     public event EventHandler OnStartDash;
     public event EventHandler OnEndDash;
@@ -29,6 +29,8 @@ public class DashAbility : MonoBehaviour {
     }
     
     void Start() {
+        dashSpeed = 15f;
+
         canDash = true;
         isDashing = false;
 
@@ -49,17 +51,15 @@ public class DashAbility : MonoBehaviour {
     }
 
     public void OnDash (InputAction.CallbackContext context) {
-        if(!canDash && !player.canStomp) return;
-
+        if(!canDash) return;
         if (context.started) {
-            if(!isDashing && player.canStomp && !player.isGrounded && player.moveInput.y < 0 && !player.isStomping){
-                player.StartStomp();
-            }
-            else{
-                if(canDash && !isDashing && _dashTimer <= 0 && !player.isStomping){
-                    StartCoroutine(nameof(Dash));
-                }
-            }
+            TiggerDash();
+        }
+    }
+
+    public void TiggerDash() {
+        if (player.moveInput.y >= 0 && _dashTimer <= 0) {
+            StartCoroutine(Dash());
         }
     }
 
@@ -81,8 +81,7 @@ public class DashAbility : MonoBehaviour {
 
         player.DisableMove();
         player.DisableDuck();
-        playerAttack.DisableAttack();
-        player.canStomp = false;
+        if(playerAttack != null) playerAttack.DisableAttack();
         
         // Enable sprinting after dash ends
         keepSprintingState = true;
@@ -112,8 +111,7 @@ public class DashAbility : MonoBehaviour {
 
         player.EnableMove();
         player.EnableDuck();
-        playerAttack.EnableAttack();
-        player.canStomp = true;
+        if(playerAttack != null) playerAttack.EnableAttack();
 
         yield return new WaitForSeconds(dashCooldownTime); // Wait for cooldown
     }
