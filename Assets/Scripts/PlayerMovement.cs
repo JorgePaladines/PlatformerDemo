@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour {
     private Vector2 _originalColliderSize;
     [SerializeField] float raycastDistance = 0.1f;
     [SerializeField] LayerMask layerMask;
+    [SerializeField] LayerMask wallLayer;
     // [SerializeField] float slopeAngleLimit = 45f;
     // [SerializeField] float downForceAdjustment = 1.2f;
 
@@ -29,6 +30,8 @@ public class PlayerMovement : MonoBehaviour {
     public bool isDucking;
     public bool keepDucking;
     public bool _inAirLastFrame;
+    public bool left;
+    public bool right;
     #endregion
 
     #region restrictive properties
@@ -66,6 +69,7 @@ public class PlayerMovement : MonoBehaviour {
         CheckDirection();
         CheckGrounded();
         Ducking();
+        CheckSides();
 
         horizontalMovementValue = rigidBody.velocity.x;
         verticalMovementValue = rigidBody.velocity.y;
@@ -110,6 +114,14 @@ public class PlayerMovement : MonoBehaviour {
 
     public void EnableGravity(){
         rigidBody.gravityScale = customGravity;
+    }
+
+    public void ForceKeepDucking(bool value) {
+        keepDucking = value;
+    }
+
+    public void ForceTurning(bool value) {
+        tryingToTurn = value;
     }
 
     private void Run() {
@@ -225,11 +237,27 @@ public class PlayerMovement : MonoBehaviour {
         }
     }
 
-    public void ForceKeepDucking(bool value) {
-        keepDucking = value;
-    }
+    private void CheckSides(){
+        Vector2 colliderCenter = bodyCollider.bounds.center;
+        Vector2 colliderSize = bodyCollider.size;
 
-    public void ForceTurning(bool value) {
-        tryingToTurn = value;
+        RaycastHit2D rightSide = Physics2D.Raycast(
+            new Vector2(colliderCenter.x + colliderSize.x / 2, colliderCenter.y),
+            Vector2.right,
+            raycastDistance,
+            wallLayer
+        );
+        RaycastHit2D leftSide = Physics2D.Raycast(
+            new Vector2(colliderCenter.x - colliderSize.x / 2, colliderCenter.y),
+            Vector2.left,
+            raycastDistance,
+            wallLayer
+        );
+
+        Debug.DrawRay(new Vector2(colliderCenter.x + colliderSize.x / 2, colliderCenter.y), Vector2.right * raycastDistance, Color.green);
+        Debug.DrawRay(new Vector2(colliderCenter.x - colliderSize.x / 2, colliderCenter.y), Vector2.left * raycastDistance, Color.red);
+
+        left = leftSide.collider != null;
+        right = rightSide.collider != null;
     }
 }

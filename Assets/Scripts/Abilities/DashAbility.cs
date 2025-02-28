@@ -15,7 +15,7 @@ public class DashAbility : MonoBehaviour {
     public bool keepSprintingState { get; private set; }
     private float _dashTimer;
 
-    [SerializeField] float dashSpeed = 15f;
+    public float dashSpeed = 15f;
     private float dashTime = 0.1f;
     private float dashCooldownTime = 0.25f;
     

@@ -3988,6 +3988,9 @@ GameObject:
   - component: {fileID: 1952166928}
   - component: {fileID: 1952166930}
   - component: {fileID: 1952166929}
+  - component: {fileID: 1952166931}
+  - component: {fileID: 1952166932}
+  - component: {fileID: 1952166933}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -4139,8 +4142,8 @@ MonoBehaviour:
     m_ActionName: Player/Fire[/Mouse/leftButton]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1952166928}
-        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+      - m_Target: {fileID: 1952166931}
+        m_TargetAssemblyTypeName: JumpAbility, Assembly-CSharp
         m_MethodName: OnJump
         m_Mode: 0
         m_Arguments:
@@ -4195,9 +4198,21 @@ MonoBehaviour:
     m_ActionName: UI/TrackedDeviceOrientation
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1952166928}
-        m_TargetAssemblyTypeName: PlayerMovement, Assembly-CSharp
+      - m_Target: {fileID: 1952166932}
+        m_TargetAssemblyTypeName: DashAbility, Assembly-CSharp
         m_MethodName: OnDash
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1952166933}
+        m_TargetAssemblyTypeName: StompAbility, Assembly-CSharp
+        m_MethodName: OnStomp
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4228,8 +4243,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runSpeed: 5
   crouchSpeed: 2
-  jumpSpeed: 18
-  doubleJumpMultiplier: 0.75
   customGravity: 4
   raycastDistance: 0.1
   layerMask:
@@ -4237,21 +4250,15 @@ MonoBehaviour:
     m_Bits: 64
   horizontalMovementValue: 0
   verticalMovementValue: 0
+  facingDirection: 0
+  playerDirection: 0
+  tryingToTurn: 0
   isGrounded: 0
   isDucking: 0
-  canDoubleJump: 1
-  isDashing: 0
-  isSprinting: 0
-  isStomping: 0
-  canAttack: 1
-  dashSpeed: 15
-  dashTime: 0.1
-  dashCooldownTime: 0.25
-  stompSpeed: 30
-  stompHorizontalSpeed: 2
-  enemyLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
+  keepDucking: 0
+  _inAirLastFrame: 0
+  canMove: 1
+  canDuck: 1
   normalDeceleration: 20
   sharpDeceleration: 40
   minVelocityThreshold: 0.1
@@ -4283,6 +4290,54 @@ MonoBehaviour:
   attackPoint: {fileID: 972970962}
   attackBox: {fileID: 523466239}
   duration: 0.3
+--- !u!114 &1952166931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952166923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1440e245d7b92844b2e0707b5dcb5b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpSpeed: 18
+  doubleJumpMultiplier: 0.75
+  canJump: 1
+  canDoubleJump: 1
+--- !u!114 &1952166932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952166923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63ab88c6112a88048932d8976ddb0e12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashSpeed: 15
+--- !u!114 &1952166933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952166923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30952d111ba4f0b41b7a110564962b2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canStomp: 1
+  isStomping: 0
+  stompSpeed: 23
+  stompHorizontalSpeed: 2
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &2071993178
 GameObject:
   m_ObjectHideFlags: 0

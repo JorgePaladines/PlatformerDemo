@@ -9,6 +9,7 @@ public class AnimationController : MonoBehaviour
     JumpAbility jumpAbility;
     DashAbility dashAbility;
     StompAbility stompAbility;
+    WallJumpAbility wallJumpAbility;
     Animator animator;
 
     // Start is called before the first frame update
@@ -18,6 +19,7 @@ public class AnimationController : MonoBehaviour
         jumpAbility = GetComponent<JumpAbility>();
         dashAbility = GetComponent<DashAbility>();
         stompAbility = GetComponent<StompAbility>();
+        wallJumpAbility = GetComponent<WallJumpAbility>();
 
         jumpAbility.OnDoubleJump += PlayDoubleJump;
         dashAbility.OnStartDash += PlayDash;
@@ -30,6 +32,12 @@ public class AnimationController : MonoBehaviour
         animator.SetFloat("verticalMovement", playerController.verticalMovementValue);
         animator.SetBool("isGrounded", playerController.isGrounded);
         animator.SetBool("isCrouching", playerController.isDucking);
+
+        if(wallJumpAbility.isWallSliding) {
+            animator.SetBool("onWall", true);
+        } else {
+            animator.SetBool("onWall", false);
+        }
     }
 
     void PlayDoubleJump(object sender, EventArgs e) {

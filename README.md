@@ -48,6 +48,13 @@ The player can control the character using the following inputs:
 - Speed: `stompSpeed` downward, limited horizontal movement (`stompHorizontalSpeed` = 2f).
 - On landing, sprints at `dashSpeed` if holding horizontal input.
 
+## Advanced Mechanics
+
+### Movement
+
+- Sprint out of a Stomp by letting go of the down input before touching the ground and holding the direction you want to go
+- Sprint out of a Wall Jump by holding the input direction fast enough after Wall Jumping
+
 ### Rhythm Mechanic
 *(To be specified later)*  
 [Placeholder for rhythm-based mechanics, possibly tied to `RhythmManager.Instance.RegisterAction(false)` in `OnJump`.]
