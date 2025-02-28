@@ -299,11 +299,11 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 12.350212, y: 22.143112}
-      - {x: -15.501829, y: 22.413324}
+    - - {x: 26.094145, y: 59.448063}
+      - {x: -13.359918, y: 59.361282}
       - {x: -14.542506, y: -9.015858}
-      - {x: 89.42305, y: -12.109723}
-      - {x: 86.166275, y: 18.051195}
+      - {x: 88.998184, y: -9.773053}
+      - {x: 90.00154, y: 58.74749}
   m_UseDelaunayMesh: 0
 --- !u!1 &298944694
 GameObject:
@@ -1207,7 +1207,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.1733935, y: -1.4143467, z: -9.907001}
+  m_LocalPosition: {x: -0.060878754, y: -2.5152266, z: -9.907001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1771,8 +1771,8 @@ Transform:
   m_GameObject: {fileID: 687636244}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -11.54, y: 4.56, z: 0}
-  m_LocalScale: {x: 18.664055, y: 1.9663731, z: 1}
+  m_LocalPosition: {x: -11.54, y: 23.2096, z: 0}
+  m_LocalScale: {x: 55.963142, y: 1.9663731, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3131,7 +3131,7 @@ Transform:
   m_GameObject: {fileID: 1574918150}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.1733935, y: -1.4143467, z: -9.907001}
+  m_LocalPosition: {x: -5.7066064, y: -2.4843466, z: -9.907001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3317,8 +3317,8 @@ Transform:
   m_GameObject: {fileID: 1606658100}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -6.6499996, y: 8.39, z: 0}
-  m_LocalScale: {x: 18.664055, y: 1.9663731, z: 1}
+  m_LocalPosition: {x: -6.65, y: 23.4276, z: 0}
+  m_LocalScale: {x: 48.74119, y: 1.9663731, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3991,6 +3991,7 @@ GameObject:
   - component: {fileID: 1952166931}
   - component: {fileID: 1952166932}
   - component: {fileID: 1952166933}
+  - component: {fileID: 1952166934}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -4007,7 +4008,7 @@ Transform:
   m_GameObject: {fileID: 1952166923}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.11, y: -1.8, z: 0}
+  m_LocalPosition: {x: -8.99, y: -2.87, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4154,6 +4155,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 1952166934}
+        m_TargetAssemblyTypeName: WallJumpAbility, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: d58c59b0-f463-427e-b98e-b696962b4d8d
     m_ActionName: Player/Jump[/Keyboard/space]
   - m_PersistentCalls:
@@ -4248,6 +4261,9 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 64
   horizontalMovementValue: 0
   verticalMovementValue: 0
   facingDirection: 0
@@ -4257,6 +4273,8 @@ MonoBehaviour:
   isDucking: 0
   keepDucking: 0
   _inAirLastFrame: 0
+  left: 0
+  right: 0
   canMove: 1
   canDuck: 1
   normalDeceleration: 20
@@ -4338,6 +4356,27 @@ MonoBehaviour:
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 256
+--- !u!114 &1952166934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952166923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64f8e8d04c2032c4db0f4aa013515f3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallJumpHorizontalForce: 18
+  wallJumpVerticalForce: 20
+  wallSlideSpeed: 2
+  postWallJumpLockoutTime: 0.3
+  wallCheckDistance: 0.1
+  canWallJump: 1
+  isWallSliding: 0
+  isWallJumping: 0
+  wallDirection: 0
 --- !u!1 &2071993178
 GameObject:
   m_ObjectHideFlags: 0

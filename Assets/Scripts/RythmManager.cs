@@ -63,9 +63,9 @@ public class RhythmManager : MonoBehaviour {
         streak = 0;
     }
 
-    void OnBeatTriggered(int beatNumber) {
-        lastBeatTime = AudioSettings.dspTime;
-        nextBeatTime = lastBeatTime + beatInterval;
+    void OnBeatTriggered(int beatNumber, double scheduledTime) {
+        lastBeatTime = scheduledTime;
+        nextBeatTime = scheduledTime + beatInterval;
     }
 
     void OnDestroy() {
