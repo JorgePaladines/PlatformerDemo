@@ -6,18 +6,23 @@ using System;
 
 public class PlayerAttack : MonoBehaviour {
     private bool attackEnabled;
-    public Transform attackPoint; // The position where the hitbox will be spawned
     private PlayerMovement player;
     private JumpAbility jumpAbility;
+    private DashAbility dashAbility;
 
     [SerializeField] GameObject attackBox;
+    [SerializeField] GameObject crouchAttackBox;
+    [SerializeField] GameObject sprintAttackBox;
     [SerializeField] float duration = 0.3f;
     
     private void Start(){
         player = GetComponent<PlayerMovement>();
         jumpAbility = GetComponent<JumpAbility>();
+        dashAbility = GetComponent<DashAbility>();
 
         attackBox.SetActive(false);
+        crouchAttackBox.SetActive(false);
+        sprintAttackBox.SetActive(false);
         attackEnabled = true;
 
         player.Landed += CancelAttack;
@@ -32,10 +37,19 @@ public class PlayerAttack : MonoBehaviour {
     }
 
     IEnumerator Attack(){
-        attackBox.SetActive(true);
+        GameObject currentAttackBox;
+        if(player.isDucking){
+            currentAttackBox = crouchAttackBox;
+        } else if(dashAbility.isSprinting){
+            currentAttackBox = sprintAttackBox;
+        } else {
+            currentAttackBox = attackBox;
+        }
+
+        currentAttackBox.SetActive(true);
         RhythmManager.Instance.RegisterAction(true);
         yield return new WaitForSeconds(duration);
-        attackBox.SetActive(false);
+        currentAttackBox.SetActive(false);
     }
 
     public bool canAttack(){

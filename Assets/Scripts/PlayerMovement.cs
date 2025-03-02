@@ -15,8 +15,8 @@ public class PlayerMovement : MonoBehaviour {
     public CapsuleCollider2D bodyCollider { get; private set; }
     private Vector2 _originalColliderSize;
     [SerializeField] float raycastDistance = 0.1f;
-    [SerializeField] LayerMask layerMask;
-    [SerializeField] LayerMask wallLayer;
+    [SerializeField] LayerMask levelGeometryLayer;
+    [SerializeField] LayerMask enemyLayer;
     // [SerializeField] float slopeAngleLimit = 45f;
     // [SerializeField] float downForceAdjustment = 1.2f;
 
@@ -180,7 +180,7 @@ public class PlayerMovement : MonoBehaviour {
             0f, 
             Vector2.down, 
             raycastDistance, 
-            layerMask
+            levelGeometryLayer | enemyLayer
         );
 
         if(groundRayCast.collider){
@@ -216,7 +216,7 @@ public class PlayerMovement : MonoBehaviour {
                 0f,
                 Vector2.up,
                 raycastDistance,
-                layerMask
+                levelGeometryLayer
             );
 
             RaycastHit2D hitCeilingLow = Physics2D.CapsuleCast(
@@ -226,7 +226,7 @@ public class PlayerMovement : MonoBehaviour {
                 0f,
                 Vector2.up,
                 raycastDistance,
-                layerMask
+                levelGeometryLayer
             );
 
             if (!hitCeilingHigh.collider && !hitCeilingLow.collider && !keepDucking) {
@@ -245,13 +245,13 @@ public class PlayerMovement : MonoBehaviour {
             new Vector2(colliderCenter.x + colliderSize.x / 2, colliderCenter.y),
             Vector2.right,
             raycastDistance,
-            wallLayer
+            levelGeometryLayer
         );
         RaycastHit2D leftSide = Physics2D.Raycast(
             new Vector2(colliderCenter.x - colliderSize.x / 2, colliderCenter.y),
             Vector2.left,
             raycastDistance,
-            wallLayer
+            levelGeometryLayer
         );
 
         Debug.DrawRay(new Vector2(colliderCenter.x + colliderSize.x / 2, colliderCenter.y), Vector2.right * raycastDistance, Color.green);

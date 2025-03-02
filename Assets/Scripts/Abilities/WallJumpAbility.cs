@@ -14,8 +14,6 @@ public class WallJumpAbility : MonoBehaviour {
     [SerializeField] private float wallJumpHorizontalForce = 18f; // Horizontal force away from wall
     [SerializeField] private float wallJumpVerticalForce = 12f;   // Vertical force for wall jump
     [SerializeField] private float wallSlideSpeed = 2f;          // Downward speed while sliding
-    [SerializeField] private float postWallJumpLockoutTime = 0.3f; // Time to restrict movement toward wall
-    [SerializeField] private float wallCheckDistance = 0.1f;     // Distance for raycast to detect wall
 
     [SerializeField] public bool canWallJump = true;
     [SerializeField] public bool isWallSliding;
@@ -85,6 +83,7 @@ public class WallJumpAbility : MonoBehaviour {
 
         isWallSliding = wallDirection != 0 && rigidBody.velocity.y <= 0;
         if (isWallSliding) {
+            EnterWallSliding?.Invoke(this, EventArgs.Empty);
             rigidBody.velocity = new Vector2(rigidBody.velocity.x, Mathf.Max(-wallSlideSpeed, rigidBody.velocity.y));
             player.SetExternalSpeed(0f); // Prevent horizontal movement overriding slide
             player.SetHorizontalVelocity(0f); // Prevent horizontal movement overriding slide
@@ -92,6 +91,9 @@ public class WallJumpAbility : MonoBehaviour {
             if(dashAbility != null) {
                 dashAbility.DisableDash(); // Disable dash while wall sliding
             }
+        }
+        else {
+            ExitWallSliding?.Invoke(this, EventArgs.Empty);
         }
     }
 
