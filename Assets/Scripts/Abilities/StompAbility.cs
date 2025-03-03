@@ -10,7 +10,7 @@ public class StompAbility : MonoBehaviour {
     [SerializeField] float stompSpeed = 23f; // Speed of downward stomp
     [SerializeField] float stompHorizontalSpeed = 2f; // Limited horizontal movement during stomp
     
-    // [SerializeField] Vector2 stompHitboxSize = new Vector2(0.5f, 0.5f); // Size of stomp hitbox
+    [SerializeField] CapsuleCollider2D[] damageHitboxes;
     [SerializeField] LayerMask enemyLayerMask; // Layer for enemies to detect
 
     PlayerMovement player;
@@ -35,6 +35,8 @@ public class StompAbility : MonoBehaviour {
         player.Landed += EndStomp;
         dashAbility.OnStartDash += DisableStomp;
         dashAbility.OnEndDash += EnableStomp;
+
+        DisableHitBoxes();
     }
 
     public void EnableStomp(object sender = null, EventArgs e = null) {
@@ -43,6 +45,18 @@ public class StompAbility : MonoBehaviour {
 
     public void DisableStomp(object sender = null, EventArgs e = null) {
         canStomp = false;
+    }
+
+    public void EnableHitBoxes() {
+        foreach (CapsuleCollider2D damageBox in damageHitboxes) {
+            damageBox.gameObject.SetActive(true);
+        }
+    }
+
+    public void DisableHitBoxes() {
+        foreach (CapsuleCollider2D damageBox in damageHitboxes) {
+            damageBox.gameObject.SetActive(false);
+        }
     }
 
     public void OnStomp (InputAction.CallbackContext context) {
@@ -63,6 +77,7 @@ public class StompAbility : MonoBehaviour {
         if(jumpAbility != null) jumpAbility.DisableJump();
         if(dashAbility != null) dashAbility.DisableDash();
         if(playerAttack != null) playerAttack.DisableAttack();
+        EnableHitBoxes();
         rigidBody.velocity = Vector2.zero; // Reset velocity before stomp
         Vector2 stompVelocity = new Vector2(rigidBody.velocity.x, -stompSpeed);
         rigidBody.velocity = stompVelocity;
@@ -75,6 +90,7 @@ public class StompAbility : MonoBehaviour {
         isStomping = false;
         player.EnableMove();
         player.SetExternalSpeed(0f);
+        DisableHitBoxes();
 
         if(jumpAbility != null) jumpAbility.EnableJump();
         if(playerAttack != null) playerAttack.EnableAttack();

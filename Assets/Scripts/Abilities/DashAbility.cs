@@ -8,6 +8,7 @@ public class DashAbility : MonoBehaviour {
     PlayerMovement player;
     Rigidbody2D rigidBody;
     PlayerAttack playerAttack;
+    private int enemyLayer;
 
     public bool canDash { get; private set; }
     public bool isDashing { get; private set; }
@@ -26,12 +27,12 @@ public class DashAbility : MonoBehaviour {
         player = GetComponent<PlayerMovement>();
         rigidBody = GetComponent<Rigidbody2D>();
         playerAttack = GetComponent<PlayerAttack>();
+        enemyLayer = LayerMask.NameToLayer("Enemy");
     }
     
     void Start() {
         canDash = true;
         isDashing = false;
-
         player.Landed += EnableDash;
     }
 
@@ -79,6 +80,7 @@ public class DashAbility : MonoBehaviour {
         OnStartDash?.Invoke(this, EventArgs.Empty);
         player.DisableGravity();
         isDashing = true;
+        Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayer, true); // Enable enemy evasion
         _dashTimer = dashCooldownTime + dashTime; // Set cooldown immediately
 
         player.DisableMove();
@@ -101,6 +103,7 @@ public class DashAbility : MonoBehaviour {
         player.EnableGravity();
         OnEndDash?.Invoke(this, EventArgs.Empty);
         isDashing = false;
+        Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayer, false); // Disable enemy evasion
         player.ForceKeepDucking(false);
 
         // Check if ducking when dash ends and stop immediately
