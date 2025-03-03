@@ -17,7 +17,8 @@ public class Enemy : MonoBehaviour {
     [Header("Movement Settings")]
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private float horizontalJumpForce = 3f;
-    [SerializeField] private float idleInterval = 2f;
+    private float startTime;
+    private float idleInterval = 2f;
     
     // Animation parameter hashes for better performance
     private readonly int idleHash = Animator.StringToHash("Idle");
@@ -31,8 +32,12 @@ public class Enemy : MonoBehaviour {
     private SpriteRenderer spriteRenderer;
     public PolygonCollider2D polygonCollider;
     public CircleCollider2D damageCollider;
+    private Color originalColor;
+    public float invulnerabilityDuration = 0.3f;
+    [SerializeField] Color flashColor;
+    [SerializeField] ParticleSystem hitEffect;
     
-    public bool facingRight = true;
+    public bool facingRight;
     public bool isGrounded = false;
     public bool wasGrounded = false;
     public bool isJumping = false;
@@ -46,7 +51,8 @@ public class Enemy : MonoBehaviour {
         Jumping,
         ToFall,
         Falling,
-        Landing
+        Landing,
+        Dying
     }
     
     public EnemyState currentState = EnemyState.Idle;
@@ -60,13 +66,20 @@ public class Enemy : MonoBehaviour {
         groundLayer = LayerMask.GetMask("LevelGeometry");
         playerLayer = LayerMask.GetMask("Player");
 
+        originalColor = spriteRenderer.color;
+
         if (animator == null) animator = GetComponent<Animator>();
     }
 
     private void Start() {
         polygonCollider.enabled = true;
         damageCollider.enabled = false;
-        startIdleCycle();
+        startTime = Random.Range(0.5f, 3f);
+        facingRight = Random.Range(0, 2) * 2 - 1 == 1;
+        if(!facingRight){
+            spriteRenderer.flipX = !facingRight;
+        }
+        Invoke("startIdleCycle", startTime);
     }
     
     private void Update() {
@@ -141,6 +154,24 @@ public class Enemy : MonoBehaviour {
         
         // Stop horizontal movement when landing
         rb.velocity = new Vector2(0, rb.velocity.y);
+    }
+
+    public void TakeDamage(){
+        StartCoroutine(FlashSprite());
+    }
+
+    private IEnumerator FlashSprite() {
+        spriteRenderer.color = flashColor;
+        yield return new WaitForSeconds(invulnerabilityDuration);
+        spriteRenderer.color = originalColor;
+    }
+
+    public void Die(){
+        if(this.hitEffect != null){
+            ParticleSystem instance = Instantiate(hitEffect, transform.position, Quaternion.identity);
+            Destroy(instance.gameObject, instance.main.duration + instance.main.startLifetime.constantMax);
+        }
+        Destroy(gameObject);
     }
 
     private bool IsGrounded() {

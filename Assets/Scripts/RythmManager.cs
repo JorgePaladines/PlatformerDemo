@@ -33,7 +33,7 @@ public class RhythmManager : MonoBehaviour {
     [SerializeField] [Range(0, 1)] private float soundVolume = 0.25f;
     private AudioSource audioSource;
 
-    
+    public bool usePowerAttack { get; private set; } = false;
 
     private void Awake() {
         if (Instance == null) {
@@ -168,12 +168,16 @@ public class RhythmManager : MonoBehaviour {
     }
 
     private void PerformPowerAttack() {
-        Debug.Log("🔥 POWER ATTACK! Extra Damage!");
+        usePowerAttack = true;
         ResetStreak();
     }
 
     private void ResetStreak() {
         streak = 0;
         lastActionWasAttack = false;
+    }
+
+    public void ResetPowerAttack(){
+        usePowerAttack = false;
     }
 }

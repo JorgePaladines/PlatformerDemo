@@ -64,7 +64,6 @@ public class PlayerAttack : MonoBehaviour {
         return attackEnabled = false;
     }
 
-    // Cancel attack if the player hit the ground or just jumped
     public void CancelAttack(object sender = null, EventArgs e = null){
         attackBox.SetActive(false);
     }
