@@ -5,66 +5,98 @@ using UnityEngine.InputSystem;
 using System;
 
 public class PlayerAttack : MonoBehaviour {
-    private bool attackEnabled;
+    public bool attackEnabled = true;
     private PlayerMovement player;
     private JumpAbility jumpAbility;
     private DashAbility dashAbility;
+    private StompAbility stompAbility;
+    private WallJumpAbility wallJumpAbility;
 
-    [SerializeField] GameObject attackBox;
-    [SerializeField] GameObject crouchAttackBox;
-    [SerializeField] GameObject sprintAttackBox;
+    private Collider2D currentHitBox;
+    [SerializeField] Collider2D attackHitBox;
+    [SerializeField] Collider2D airHitBox;
+    [SerializeField] Collider2D crouchHitBox;
+    [SerializeField] Collider2D sprintHitBox;
     [SerializeField] float duration = 0.3f;
+
+    public event EventHandler OnAttackStart;
+    public event EventHandler OnAttackEnd;
     
     private void Start(){
         player = GetComponent<PlayerMovement>();
         jumpAbility = GetComponent<JumpAbility>();
         dashAbility = GetComponent<DashAbility>();
+        stompAbility = GetComponent<StompAbility>();
+        wallJumpAbility = GetComponent<WallJumpAbility>();
 
-        attackBox.SetActive(false);
-        crouchAttackBox.SetActive(false);
-        sprintAttackBox.SetActive(false);
-        attackEnabled = true;
+        attackHitBox?.gameObject.SetActive(false);
+        airHitBox?.gameObject.SetActive(false);
+        crouchHitBox?.gameObject.SetActive(false);
+        sprintHitBox?.gameObject.SetActive(false);
+        currentHitBox = attackHitBox;
 
         player.Landed += CancelAttack;
+        player.EnterCrouch += CancelAttack;
+        player.ExitCrouch += CancelAttack;
         jumpAbility.Jumped += CancelAttack;
+        dashAbility.OnStartDash += CancelAttack;
+        dashAbility.OnStartDash += DisableAttack;
+        dashAbility.OnEndDash += EnableAttack;
+        stompAbility.OnStartStomp += DisableAttack;
+        stompAbility.OnEndStomp += EnableAttack;
+        wallJumpAbility.EnterWallSliding += DisableAttack;
+        wallJumpAbility.ExitWallSliding += EnableAttack;
     }
 
     public void OnAttack(InputAction.CallbackContext context) {
-        if (player == null || attackBox == null) return;
-        if (context.started && attackEnabled) {
+        if (player == null || !attackEnabled) return;
+        if (context.started) {
             StartCoroutine(nameof(Attack));
         }
     }
 
     IEnumerator Attack(){
-        GameObject currentAttackBox;
-        if(player.isDucking){
-            currentAttackBox = crouchAttackBox;
-        } else if(dashAbility.isSprinting){
-            currentAttackBox = sprintAttackBox;
-        } else {
-            currentAttackBox = attackBox;
+        OnAttackStart?.Invoke(this, EventArgs.Empty);
+        DisableAttack();
+
+        if(!player.isGrounded){
+            currentHitBox = airHitBox;
+        }
+        else{
+            if(player.isDucking){
+                currentHitBox = crouchHitBox;
+            }
+            else if(dashAbility.isSprinting){
+                currentHitBox = sprintHitBox;
+            }
+            else {
+                currentHitBox = attackHitBox;
+            }
         }
 
-        currentAttackBox.SetActive(true);
+        currentHitBox.gameObject.SetActive(true);
         RhythmManager.Instance.RegisterAction(true);
+
         yield return new WaitForSeconds(duration);
-        currentAttackBox.SetActive(false);
+
+        OnAttackEnd?.Invoke(this, EventArgs.Empty);
+        currentHitBox.gameObject.SetActive(false);
+        EnableAttack();
     }
 
     public bool canAttack(){
         return attackEnabled;
     }
 
-    public bool EnableAttack(){
-        return attackEnabled = true;
+    public void EnableAttack(object sender = null, EventArgs e = null){
+        attackEnabled = true;
     }
 
-    public bool DisableAttack(){
-        return attackEnabled = false;
+    public void DisableAttack(object sender = null, EventArgs e = null){
+        attackEnabled = false;
     }
 
     public void CancelAttack(object sender = null, EventArgs e = null){
-        attackBox.SetActive(false);
+        currentHitBox?.gameObject.SetActive(false);
     }
 }

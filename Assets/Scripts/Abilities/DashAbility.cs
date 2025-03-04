@@ -17,7 +17,7 @@ public class DashAbility : MonoBehaviour {
     private float _dashTimer;
 
     public float dashSpeed = 15f;
-    private float dashTime = 0.1f;
+    private float dashTime = 0.2f;
     private float dashCooldownTime = 0.25f;
     
     public event EventHandler OnStartDash;
@@ -85,7 +85,7 @@ public class DashAbility : MonoBehaviour {
 
         player.DisableMove();
         player.DisableDuck();
-        if(playerAttack != null) playerAttack.DisableAttack();
+        // if(playerAttack != null) playerAttack.DisableAttack();
         
         // Enable sprinting after dash ends
         keepSprintingState = true;
@@ -94,15 +94,17 @@ public class DashAbility : MonoBehaviour {
 
         // Apply dash velocity
         int directionToDash = player.moveInput.x == 0 ? player.facingDirection : player.playerDirection;
+        player.LockFacingDirection(directionToDash);
         float newVelocity = dashSpeed * directionToDash;
         player.SetHorizontalVelocity(newVelocity);
         rigidBody.velocity = new Vector2(newVelocity, 0f);
 
         yield return new WaitForSeconds(dashTime);
 
-        player.EnableGravity();
         OnEndDash?.Invoke(this, EventArgs.Empty);
+        player.EnableGravity();
         isDashing = false;
+        player.UnlockFacingDirection();
         Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayer, false); // Disable enemy evasion
         player.ForceKeepDucking(false);
 
@@ -116,7 +118,7 @@ public class DashAbility : MonoBehaviour {
 
         player.EnableMove();
         player.EnableDuck();
-        if(playerAttack != null) playerAttack.EnableAttack();
+        // if(playerAttack != null) playerAttack.EnableAttack();
 
         yield return new WaitForSeconds(dashCooldownTime); // Wait for cooldown
     }

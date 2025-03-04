@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class AnimationController : MonoBehaviour
-{
+public class AnimationController : MonoBehaviour {
     PlayerMovement playerController;
+    PlayerAttack playerAttack;
     JumpAbility jumpAbility;
     DashAbility dashAbility;
     StompAbility stompAbility;
@@ -15,6 +15,7 @@ public class AnimationController : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
         playerController = GetComponent<PlayerMovement>();
+        playerAttack = GetComponent<PlayerAttack>();
         animator = GetComponentInChildren<Animator>();
         jumpAbility = GetComponent<JumpAbility>();
         dashAbility = GetComponent<DashAbility>();
@@ -22,16 +23,19 @@ public class AnimationController : MonoBehaviour
         wallJumpAbility = GetComponent<WallJumpAbility>();
 
         jumpAbility.OnDoubleJump += PlayDoubleJump;
-        dashAbility.OnStartDash += PlayDash;
-        stompAbility.OnStartStomp += PlayStomp;
+        playerAttack.OnAttackStart += StartAttack;
+        playerAttack.OnAttackEnd += EndAttack;
     }
 
     // Update is called once per frame
     void Update() {
-        animator.SetFloat("horizontalMovement", Mathf.Abs(playerController.horizontalMovementValue));
+        animator.SetFloat("horizontalMovement", Math.Abs(playerController.horizontalMovementValue));
         animator.SetFloat("verticalMovement", playerController.verticalMovementValue);
         animator.SetBool("isGrounded", playerController.isGrounded);
+        animator.SetBool("isDucking", playerController.isDucking);
         animator.SetBool("isCrouching", playerController.isDucking);
+        animator.SetBool("isDashing", dashAbility.isDashing);
+        animator.SetBool("isStomping", stompAbility.isStomping);
 
         if(wallJumpAbility.isWallSliding) {
             animator.SetBool("onWall", true);
@@ -44,11 +48,10 @@ public class AnimationController : MonoBehaviour
         animator.SetTrigger("doubleJump");
     }
 
-    void PlayDash (object sender, EventArgs e) {
-        animator.Play("slide");
+    void StartAttack(object sender, EventArgs e) {
+        animator.SetTrigger("attack");
     }
 
-    void PlayStomp (object sender, EventArgs e) {
-        animator.Play("stomp");
+    void EndAttack(object sender, EventArgs e) {
     }
 }

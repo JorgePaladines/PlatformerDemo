@@ -60,8 +60,7 @@ public class StompAbility : MonoBehaviour {
     }
 
     public void OnStomp (InputAction.CallbackContext context) {
-        if(!canStomp) return;
-        if (player == null) return;
+        if(!canStomp || player == null) return;
         if (context.started) {
             bool isDashing = dashAbility?.isDashing ?? false;
             if(!isDashing && canStomp && !player.isGrounded && player.moveInput.y < 0 && !isStomping){

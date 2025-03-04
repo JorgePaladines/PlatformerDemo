@@ -32,6 +32,7 @@ public class JumpAbility : MonoBehaviour {
         
         if (context.started) {
             if(player.isGrounded){
+                Debug.Log("OnJump");
                 Jumped?.Invoke(this, EventArgs.Empty);
                 rigidBody.velocity += new Vector2(0f, jumpSpeed);
             }

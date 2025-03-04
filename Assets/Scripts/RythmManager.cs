@@ -168,6 +168,7 @@ public class RhythmManager : MonoBehaviour {
     }
 
     private void PerformPowerAttack() {
+        Debug.Log("POWER ATTACK");
         usePowerAttack = true;
         ResetStreak();
     }

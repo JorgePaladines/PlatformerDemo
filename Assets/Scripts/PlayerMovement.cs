@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour {
     public float externalSpeed { get; private set; }
     [SerializeField] float customGravity  = 4f;
 
+    PlayerAttack playerAttack;
     public Vector2 moveInput { get; private set; }
     Rigidbody2D rigidBody;
     public CapsuleCollider2D bodyCollider { get; private set; }
@@ -17,8 +18,6 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField] float raycastDistance = 0.1f;
     [SerializeField] LayerMask levelGeometryLayer;
     [SerializeField] LayerMask enemyLayer;
-    // [SerializeField] float slopeAngleLimit = 45f;
-    // [SerializeField] float downForceAdjustment = 1.2f;
 
     #region validation properties
     public float horizontalMovementValue;
@@ -26,6 +25,7 @@ public class PlayerMovement : MonoBehaviour {
     public int facingDirection; // Direction the playable character faces
     public int playerDirection; // Direction the player is trying to go to
     public bool tryingToTurn;
+    public bool isFacingLocked;
     public bool isGrounded;
     public bool isDucking;
     public bool keepDucking;
@@ -48,10 +48,13 @@ public class PlayerMovement : MonoBehaviour {
     #endregion
 
     public event EventHandler Landed;
+    public event EventHandler EnterCrouch;
+    public event EventHandler ExitCrouch;
 
     void Start()  {
         rigidBody = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<CapsuleCollider2D>();
+        playerAttack = GetComponent<PlayerAttack>();
 
         rigidBody.gravityScale = customGravity;
         _originalColliderSize = bodyCollider.size;
@@ -124,6 +127,16 @@ public class PlayerMovement : MonoBehaviour {
         tryingToTurn = value;
     }
 
+    public void LockFacingDirection(int direction) {
+        isFacingLocked = true;
+        facingDirection = direction;
+        transform.rotation = Quaternion.Euler(0f, direction < 0 ? 180f : 0f, 0f);
+    }
+
+    public void UnlockFacingDirection() {
+        isFacingLocked = false;
+    }
+
     private void Run() {
         if (!canMove) return;
 
@@ -160,6 +173,8 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void CheckDirection() {
+        if (isFacingLocked) return;
+        
         if (rigidBody.velocity.x < 0) {
             transform.rotation = Quaternion.Euler(0f, 180f, 0f);
             facingDirection = -1;
@@ -186,7 +201,10 @@ public class PlayerMovement : MonoBehaviour {
         if(groundRayCast.collider){
             isGrounded = true;
 
-            if(isGrounded && _inAirLastFrame) Landed?.Invoke(this, EventArgs.Empty);
+            if(isGrounded && _inAirLastFrame){
+                Debug.Log("Landed");
+                Landed?.Invoke(this, EventArgs.Empty);
+            }
         }
         else{
             isGrounded = false;
@@ -196,14 +214,17 @@ public class PlayerMovement : MonoBehaviour {
     private void Ducking() {
         if (!canDuck) return;
 
-        if (!isGrounded) {
+        if (!isGrounded && isDucking) {
+            ExitCrouch?.Invoke(this, EventArgs.Empty);
             isDucking = false;
             if (bodyCollider.size != _originalColliderSize) {
                 bodyCollider.size = _originalColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);
             }
+            
         }
         else if (moveInput.y < 0 && Math.Abs(_currentHorizontalVelocity) <= crouchSpeed && isGrounded && !isDucking) {
+            EnterCrouch?.Invoke(this, EventArgs.Empty);
             bodyCollider.size = new Vector2(bodyCollider.size.x, bodyCollider.size.y / 2);
             bodyCollider.offset = new Vector2(0f, -bodyCollider.size.y / 2);
             isDucking = true;
@@ -230,6 +251,7 @@ public class PlayerMovement : MonoBehaviour {
             );
 
             if (!hitCeilingHigh.collider && !hitCeilingLow.collider && !keepDucking) {
+                ExitCrouch?.Invoke(this, EventArgs.Empty);
                 bodyCollider.size = _originalColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);
                 isDucking = false;

@@ -81,9 +81,17 @@ public class WallJumpAbility : MonoBehaviour {
             wallDirection = -1; // Left wall
         }
 
+        bool wasWallSliding = isWallSliding;
         isWallSliding = wallDirection != 0 && rigidBody.velocity.y <= 0;
-        if (isWallSliding) {
+
+        if(!wasWallSliding && isWallSliding){
             EnterWallSliding?.Invoke(this, EventArgs.Empty);
+        }
+        else if(wasWallSliding && !isWallSliding){
+            ExitWallSliding?.Invoke(this, EventArgs.Empty);
+        }
+
+        if (isWallSliding) {
             rigidBody.velocity = new Vector2(rigidBody.velocity.x, Mathf.Max(-wallSlideSpeed, rigidBody.velocity.y));
             player.SetExternalSpeed(0f); // Prevent horizontal movement overriding slide
             player.SetHorizontalVelocity(0f); // Prevent horizontal movement overriding slide
@@ -91,9 +99,6 @@ public class WallJumpAbility : MonoBehaviour {
             if(dashAbility != null) {
                 dashAbility.DisableDash(); // Disable dash while wall sliding
             }
-        }
-        else {
-            ExitWallSliding?.Invoke(this, EventArgs.Empty);
         }
     }
 
