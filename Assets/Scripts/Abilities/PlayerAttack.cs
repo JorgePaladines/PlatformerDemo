@@ -21,7 +21,7 @@ public class PlayerAttack : MonoBehaviour {
     [SerializeField] Collider2D airHitBox;
     [SerializeField] Collider2D crouchHitBox;
     [SerializeField] Collider2D sprintHitBox;
-    [SerializeField] float duration = 0.3f;
+    [SerializeField] float duration = 0.1f;
 
     [SerializeField] AudioClip attackSound;
     [SerializeField] AudioClip powerAttackSound;
@@ -85,15 +85,6 @@ public class PlayerAttack : MonoBehaviour {
             audioSource.clip = attackSound;
         }
         audioSource.Play();
-
-        // if(onBeat){
-        //     audioSource.clip = attackSound;
-        // }
-        // else{
-
-        // }
-
-        
 
         if(!player.isGrounded){
             currentHitBox = airHitBox;

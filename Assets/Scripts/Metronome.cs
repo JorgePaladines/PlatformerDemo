@@ -19,7 +19,7 @@ public class Metronome : MonoBehaviour {
     private const double scheduleAheadTime = 0.1;
 
     private Queue<(double scheduledTime, int beatNumber)> scheduledBeats = new Queue<(double scheduledTime, int beatNumber)>();
-    private bool isRunning = false;
+    public bool isRunning  { get; private set; } = false;
 
     public double TickInterval => 60.0 / bpm;
 
