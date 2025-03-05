@@ -72,8 +72,7 @@ public class Metronome : MonoBehaviour {
             return;
         }
         source.clip = tickSound;
-        source.PlayScheduled(time); // Uncomment to play sound
-
+        source.PlayScheduled(time);
         scheduledBeats.Enqueue((time, beatCount));
         beatCount++;
     }

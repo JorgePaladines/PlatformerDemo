@@ -1525,7 +1525,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  damageMultiplier: 2
+  damageMultiplier: 5
+  damageDivider: 10
 --- !u!70 &523466246 stripped
 CapsuleCollider2D:
   m_CorrespondingSourceObject: {fileID: 5204957116142399983, guid: 97d994e88340b3f4ca04a8e3dbf3ce6a, type: 3}
@@ -1684,7 +1685,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  damageMultiplier: 2
+  damageMultiplier: 5
+  damageDivider: 10
 --- !u!61 &664519683 stripped
 BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 1515849841542068325, guid: 9e390a4739606ed478a91d0e35d7ca32, type: 3}
@@ -2232,6 +2234,22 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5204957116142399983, guid: 97d994e88340b3f4ca04a8e3dbf3ce6a, type: 3}
+      propertyPath: m_Size.x
+      value: 1.2044859
+      objectReference: {fileID: 0}
+    - target: {fileID: 5204957116142399983, guid: 97d994e88340b3f4ca04a8e3dbf3ce6a, type: 3}
+      propertyPath: m_Size.y
+      value: 1.5517026
+      objectReference: {fileID: 0}
+    - target: {fileID: 5204957116142399983, guid: 97d994e88340b3f4ca04a8e3dbf3ce6a, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.10224295
+      objectReference: {fileID: 0}
+    - target: {fileID: 5204957116142399983, guid: 97d994e88340b3f4ca04a8e3dbf3ce6a, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.12977022
+      objectReference: {fileID: 0}
     - target: {fileID: 8666449549609115845, guid: 97d994e88340b3f4ca04a8e3dbf3ce6a, type: 3}
       propertyPath: m_Name
       value: PlayerAttackBox
@@ -2324,7 +2342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beatInterval: 1
-  beatWindow: 0.4
+  beatWindow: 0.2
   requiredStreak: 4
   streak: 0
   lastBeatPlace: 0
@@ -2519,7 +2537,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  damageMultiplier: 2
+  damageMultiplier: 5
+  damageDivider: 10
 --- !u!58 &964134970 stripped
 CircleCollider2D:
   m_CorrespondingSourceObject: {fileID: 7573848477772757766, guid: 6810eed286d3e9a4e9c29f4d712a8f47, type: 3}
@@ -3066,7 +3085,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  damageMultiplier: 2
+  damageMultiplier: 5
+  damageDivider: 10
 --- !u!1 &1148042855
 GameObject:
   m_ObjectHideFlags: 0
@@ -3469,7 +3489,7 @@ GameObject:
   - component: {fileID: 1227040033}
   - component: {fileID: 1227040032}
   m_Layer: 3
-  m_Name: GameObject
+  m_Name: SpriteAnimation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5517,11 +5537,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackEnabled: 1
+  onBeat: 0
   attackHitBox: {fileID: 523466246}
   airHitBox: {fileID: 1065992476}
   crouchHitBox: {fileID: 964134970}
   sprintHitBox: {fileID: 664519683}
   duration: 0.3
+  powerAttackSound: {fileID: 8300000, guid: ae37f828462cb734a87dc5afcd4c5234, type: 3}
 --- !u!70 &2090051721 stripped
 CapsuleCollider2D:
   m_CorrespondingSourceObject: {fileID: 4829732279882574598, guid: a68f575df29e4494aad84c8105142710, type: 3}
@@ -5881,6 +5903,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1952166924}
     m_Modifications:
+    - target: {fileID: 1416677103747519399, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
+      propertyPath: damageDivider
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1416677103747519399, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
+      propertyPath: damageMultiplier
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3782781280442018544, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
       propertyPath: m_Name
       value: StompHitboxLeft
@@ -5942,6 +5972,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: StompHitboxRight
       objectReference: {fileID: 0}
+    - target: {fileID: 7373364833538579023, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
+      propertyPath: damageDivider
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7373364833538579023, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
+      propertyPath: damageMultiplier
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8068054590498860392, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.41200018
@@ -5995,6 +6033,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1952166924}
     m_Modifications:
+    - target: {fileID: 4144631619346287153, guid: a68f575df29e4494aad84c8105142710, type: 3}
+      propertyPath: damageDivider
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 4144631619346287153, guid: a68f575df29e4494aad84c8105142710, type: 3}
+      propertyPath: damageMultiplier
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5129133858710756441, guid: a68f575df29e4494aad84c8105142710, type: 3}
       propertyPath: m_Name
       value: StompKillBox
@@ -6198,6 +6244,7 @@ SceneRoots:
   - {fileID: 1952166924}
   - {fileID: 7707349045105613858}
   - {fileID: 1343372279}
+  - {fileID: 243065499}
   - {fileID: 2142380921}
   - {fileID: 1050944635}
   - {fileID: 2124246261}
@@ -6229,4 +6276,3 @@ SceneRoots:
   - {fileID: 94055163}
   - {fileID: 1216875295}
   - {fileID: 380613843}
-  - {fileID: 243065499}

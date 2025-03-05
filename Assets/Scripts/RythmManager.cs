@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class RhythmManager : MonoBehaviour {
     public static RhythmManager Instance;
@@ -13,7 +14,7 @@ public class RhythmManager : MonoBehaviour {
     [Tooltip("Number of consecutive valid actions needed for a power-up attack")]
     public int requiredStreak = 4;
     [Tooltip("Tracks consecutive on-beat actions")]
-    [SerializeField] private int streak;
+    public int streak;
     private bool lastActionWasAttack;
     [Tooltip("0 - Miss, 1 - First Window, 2 - Second Window")]
     [SerializeField] int lastBeatPlace;
@@ -34,6 +35,7 @@ public class RhythmManager : MonoBehaviour {
     private AudioSource audioSource;
 
     public bool usePowerAttack { get; private set; } = false;
+    public event EventHandler OnPowerAttack;
 
     private void Awake() {
         if (Instance == null) {
@@ -150,12 +152,14 @@ public class RhythmManager : MonoBehaviour {
 
     // Call this when a player action occurs.
     // isAttack should be true for attacks, false for other actions (jumps, dashes, etc.).
-    public void RegisterAction(bool isAttack) {
+    public bool RegisterAction(bool isAttack) {
         if (IsOnBeat()) {
             SuccessfulHit(isAttack);
+            return true;
         }
         else {
             ResetStreak();
+            return false;
         }
     }
 
@@ -169,6 +173,7 @@ public class RhythmManager : MonoBehaviour {
 
     private void PerformPowerAttack() {
         Debug.Log("POWER ATTACK");
+        OnPowerAttack?.Invoke(this, EventArgs.Empty);
         usePowerAttack = true;
         ResetStreak();
     }

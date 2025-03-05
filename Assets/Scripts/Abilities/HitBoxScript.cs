@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class HitBoxScript : MonoBehaviour {
     [SerializeField] float damage = 10f;
-    [SerializeField] float damageMultiplier = 2f;
+    [SerializeField] float damageMultiplier = 3f;
+    [SerializeField] float damageDivider = 10f;
 
     private void Start(){
         gameObject.SetActive(false);
@@ -16,5 +17,9 @@ public class HitBoxScript : MonoBehaviour {
 
     public float GetMultiplier(){
         return damageMultiplier;
+    }
+
+    public float GetDivider(){
+        return damageDivider;
     }
 }

@@ -202,7 +202,6 @@ public class PlayerMovement : MonoBehaviour {
             isGrounded = true;
 
             if(isGrounded && _inAirLastFrame){
-                Debug.Log("Landed");
                 Landed?.Invoke(this, EventArgs.Empty);
             }
         }

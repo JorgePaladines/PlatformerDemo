@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class HealthBarScript : MonoBehaviour {
     RhythmManager rhythmManager;
+    PlayerAttack playerAttack;
 
     [Header("Health Settings")]
     [SerializeField] private int maxHealth = 100;
@@ -23,6 +24,7 @@ public class HealthBarScript : MonoBehaviour {
     
     private void Awake() {
         rhythmManager = FindAnyObjectByType<RhythmManager>();
+        playerAttack = FindAnyObjectByType<PlayerAttack>();
         enemy = GetComponent<Enemy>();
         currentHealth = maxHealth;
         InstantiateHealthBar();
@@ -110,9 +112,16 @@ public class HealthBarScript : MonoBehaviour {
         if (targetLayers == (targetLayers | (1 << collidedLayer)) && other.isTrigger) {
             HitBoxScript hitBox = other.gameObject.GetComponent<HitBoxScript>();
             if (hitBox != null) {
-                float damageAmount = rhythmManager.usePowerAttack ? 
-                    hitBox.GetMultiplier() * hitBox.GetDamage() 
-                    : hitBox.GetDamage();
+                float damageAmount;
+                if(rhythmManager.usePowerAttack){
+                    damageAmount = hitBox.GetDamage() * hitBox.GetMultiplier();
+                }
+                else if(!rhythmManager.usePowerAttack && !playerAttack.onBeat) {
+                    damageAmount = hitBox.GetDamage() / hitBox.GetDivider();
+                }
+                else{
+                    damageAmount = hitBox.GetDamage();
+                }
                 TakeDamage(damageAmount);
             }
         }
