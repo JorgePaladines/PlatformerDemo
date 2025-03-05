@@ -29,6 +29,7 @@ public class PlayerAttack : MonoBehaviour {
     private AudioSource audioSource;
 
     public event EventHandler OnAttackStart;
+    public event EventHandler OnPowerAttack;
     public event EventHandler OnAttackEnd;
 
     private void Start(){
@@ -74,14 +75,15 @@ public class PlayerAttack : MonoBehaviour {
     }
 
     IEnumerator Attack(){
-        OnAttackStart?.Invoke(this, EventArgs.Empty);
         DisableAttack();
         onBeat = RhythmManager.Instance.RegisterAction(true);
 
         if(rhythmManager.usePowerAttack){
+            OnPowerAttack?.Invoke(this, EventArgs.Empty);
             audioSource.clip = powerAttackSound;
         }
         else{
+            OnAttackStart?.Invoke(this, EventArgs.Empty);
             audioSource.clip = attackSound;
         }
         audioSource.Play();
@@ -116,9 +118,9 @@ public class PlayerAttack : MonoBehaviour {
 
     IEnumerator DoFeedback(){
         if(spriteRenderer != null){
-            spriteRenderer.color = Color.red;
+            // spriteRenderer.color = Color.red;
             yield return new WaitForSeconds(duration);
-            spriteRenderer.color = Color.white;
+            // spriteRenderer.color = Color.white;
             rhythmManager.ResetPowerAttack();
         }
     }

@@ -24,6 +24,7 @@ public class AnimationController : MonoBehaviour {
 
         jumpAbility.OnDoubleJump += PlayDoubleJump;
         playerAttack.OnAttackStart += StartAttack;
+        playerAttack.OnPowerAttack += PowerAttackAnimation;
         playerAttack.OnAttackEnd += EndAttack;
     }
 
@@ -50,6 +51,10 @@ public class AnimationController : MonoBehaviour {
 
     void StartAttack(object sender, EventArgs e) {
         animator.SetTrigger("attack");
+    }
+
+    void PowerAttackAnimation(object sender, EventArgs e) {
+        animator.SetTrigger("powerAttack");
     }
 
     void EndAttack(object sender, EventArgs e) {
