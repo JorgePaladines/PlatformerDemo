@@ -16,16 +16,16 @@ public class RhythmManager : MonoBehaviour {
     [Tooltip("Tracks consecutive on-beat actions")]
     public int streak;
     private bool lastActionWasAttack;
-    [Tooltip("0 - Miss, 1 - First Window, 2 - Second Window")]
-    [SerializeField] int lastBeatPlace;
     [Tooltip("Time when the player hit the last time")]
     [SerializeField] double lastHitTime;
-    [Tooltip("When the nexct beat will drop")]
+    [Tooltip("0 - Miss, 1 - First Window, 2 - Second Window")]
+    [SerializeField] int lastBeatPlace;
+    [Tooltip("When the next beat will drop")]
     private double nextBeatTime;
     [Tooltip("When the last beat droppped")]
     private double lastBeatTime;
-    [SerializeField] private double nextBeatTimeCheck;
-    [SerializeField] private double lastBeatTimeCheck;
+    [SerializeField] double nextBeatTimeCheck; // Saved last beat time when the player hit
+    [SerializeField] double lastBeatTimeCheck; // Saved next beat time when the player hit
     [Tooltip("Check the time when the player hit this time")]
     public double timeHit;
 
@@ -35,6 +35,8 @@ public class RhythmManager : MonoBehaviour {
     private AudioSource audioSource;
 
     public bool usePowerAttack { get; private set; } = false;
+
+    public event EventHandler OnSuccessfulHit;
     public event EventHandler OnPowerAttack;
 
     private void Awake() {
@@ -77,7 +79,7 @@ public class RhythmManager : MonoBehaviour {
         }
     }
 
-    // Determines if the current time is within the valid window for the most recent beat
+    // Checks if player did action on beat and changes variabled accordingly
     public bool IsOnBeat() {
         timeHit = AudioSettings.dspTime;
         lastBeatTimeCheck = lastBeatTime;
@@ -108,7 +110,7 @@ public class RhythmManager : MonoBehaviour {
                 double previousBeatEndWindow = previousBeatTime + beatWindow;
                 // It must have come from the previous beat only
                 bool lastHitWithinPreviousFirstWindow = lastHitTime >= previousBeatTime && lastHitTime <= previousBeatEndWindow;
-                // So it is is outside of the previous last window, the streak resets
+                // So if it is is outside of the previous last window, the streak resets
                 if(!lastHitWithinPreviousFirstWindow){
                     ResetStreak();
                 }
@@ -150,6 +152,27 @@ public class RhythmManager : MonoBehaviour {
         return false;
     }
 
+    // Check if the player still has chance to hit the beat
+    public bool PlayerStillHasChance() {
+        double currentCheckTime = AudioSettings.dspTime;
+
+        if(currentCheckTime > nextBeatTime){
+            currentCheckTime = nextBeatTime;
+        }
+
+        // Validate if we are already at the next beat interval since the player's last hit
+        bool onFollowingBeatInterval = timeHit < lastBeatTime;
+
+        if(onFollowingBeatInterval){
+            // If the current time is already after the end of the second window, its a full miss
+            double lastBeatFirstEndWindow = nextBeatTimeCheck + beatWindow;
+            return currentCheckTime <= lastBeatFirstEndWindow;
+        }
+        
+        // The player still has chance
+        return true;
+    }
+
     // Call this when a player action occurs.
     // isAttack should be true for attacks, false for other actions (jumps, dashes, etc.).
     public bool RegisterAction(bool isAttack) {
@@ -168,6 +191,9 @@ public class RhythmManager : MonoBehaviour {
         lastActionWasAttack = isAttack;
         if (streak >= requiredStreak && lastActionWasAttack) {
             PerformPowerAttack();
+        }
+        else{
+            OnSuccessfulHit?.Invoke(this, EventArgs.Empty);
         }
     }
 

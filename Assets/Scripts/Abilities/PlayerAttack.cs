@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
+using static UnityEngine.ParticleSystem;
 
 public class PlayerAttack : MonoBehaviour {
     RhythmManager rhythmManager;
@@ -23,6 +24,10 @@ public class PlayerAttack : MonoBehaviour {
     [SerializeField] Collider2D sprintHitBox;
     [SerializeField] float duration = 0.1f;
 
+    [Header("Power Attack Settings")]
+    [SerializeField] ParticleSystem powerUpEffectPrefab;
+    ParticleSystem powerUpEffect;
+    EmissionModule emission;
     [SerializeField] AudioClip attackSound;
     [SerializeField] AudioClip powerAttackSound;
     [SerializeField] AudioClip extraPowerSound;
@@ -53,6 +58,13 @@ public class PlayerAttack : MonoBehaviour {
         sprintHitBox?.gameObject.SetActive(false);
         currentHitBox = attackHitBox;
 
+        if (powerUpEffectPrefab != null) {
+            powerUpEffect = Instantiate(powerUpEffectPrefab, player.transform);
+            powerUpEffect.Pause();
+            emission = powerUpEffect.emission;
+            emission.rateOverTime = 0;
+        }
+
         player.Landed += CancelAttack;
         player.EnterCrouch += CancelAttack;
         player.ExitCrouch += CancelAttack;
@@ -65,6 +77,18 @@ public class PlayerAttack : MonoBehaviour {
         wallJumpAbility.EnterWallSliding += DisableAttack;
         wallJumpAbility.ExitWallSliding += EnableAttack;
         rhythmManager.OnPowerAttack += VisualFeedback;
+    }
+
+    private void Update() {
+        if(powerUpEffect != null && powerUpEffectPrefab != null && powerUpEffect.transform.localPosition.z != player.facingDirection){
+            powerUpEffect.transform.localPosition = new Vector3(
+                powerUpEffect.transform.localPosition.x,
+                powerUpEffect.transform.localPosition.y,
+                player.facingDirection
+            );
+        }
+
+        HandlePowerEffectEmission();
     }
 
     public void OnAttack(InputAction.CallbackContext context) {
@@ -112,15 +136,38 @@ public class PlayerAttack : MonoBehaviour {
         EnableAttack();
     }
 
-    private void VisualFeedback(object sender, EventArgs e) {
-        StartCoroutine(DoFeedback());
+    private void HandlePowerEffectEmission() {
+        if (rhythmManager.streak > 0 && rhythmManager.PlayerStillHasChance()) {
+            if(!powerUpEffect.isPlaying){
+                powerUpEffect.Play();
+            }
+            switch (rhythmManager.streak) {
+                case 1:
+                    emission.rateOverTime = 30;
+                    break;
+                case 2:
+                    emission.rateOverTime = 100;
+                    break;
+                case 3:
+                    emission.rateOverTime = 500;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else {
+            emission.rateOverTime = 0;
+            powerUpEffect.Stop();
+        }
     }
 
-    IEnumerator DoFeedback(){
+    private void VisualFeedback(object sender, EventArgs e) {
+        StartCoroutine(ResetPowerAttack());
+    }
+
+    IEnumerator ResetPowerAttack(){
         if(spriteRenderer != null){
-            // spriteRenderer.color = Color.red;
             yield return new WaitForSeconds(duration);
-            // spriteRenderer.color = Color.white;
             rhythmManager.ResetPowerAttack();
         }
     }
