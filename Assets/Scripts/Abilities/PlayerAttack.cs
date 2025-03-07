@@ -7,6 +7,7 @@ using static UnityEngine.ParticleSystem;
 
 public class PlayerAttack : MonoBehaviour {
     RhythmManager rhythmManager;
+    public Material shaderMaterial;
 
     public bool attackEnabled = true;
     public bool onBeat;
@@ -64,6 +65,8 @@ public class PlayerAttack : MonoBehaviour {
             emission = powerUpEffect.emission;
             emission.rateOverTime = 0;
         }
+
+        shaderMaterial.SetFloat("_Amount", 0f);
 
         player.Landed += CancelAttack;
         player.EnterCrouch += CancelAttack;
@@ -137,26 +140,36 @@ public class PlayerAttack : MonoBehaviour {
     }
 
     private void HandlePowerEffectEmission() {
-        if (rhythmManager.streak > 0 && rhythmManager.PlayerStillHasChance()) {
+        if(rhythmManager.usePowerAttack){
+            emission.rateOverTime = 100;
+            shaderMaterial.SetFloat("_Amount", 0.000002f);
+        }
+        else if (rhythmManager.streak > 0 && rhythmManager.PlayerStillHasChance()) {
             if(!powerUpEffect.isPlaying){
                 powerUpEffect.Play();
             }
             switch (rhythmManager.streak) {
+                case 0:
+                    emission.rateOverTime = 0;
+                    shaderMaterial.SetFloat("_Amount", 0f);
+                    break;
                 case 1:
-                    emission.rateOverTime = 30;
+                    emission.rateOverTime = 10;
+                    shaderMaterial.SetFloat("_Amount", 0.000001f);
                     break;
                 case 2:
-                    emission.rateOverTime = 100;
-                    break;
-                case 3:
-                    emission.rateOverTime = 500;
+                    emission.rateOverTime = 50;
+                    shaderMaterial.SetFloat("_Amount", 0.00001f);
                     break;
                 default:
+                    emission.rateOverTime = 100;
+                    shaderMaterial.SetFloat("_Amount", 0.00005f);
                     break;
             }
         }
         else {
             emission.rateOverTime = 0;
+            shaderMaterial.SetFloat("_Amount", 0f);
             powerUpEffect.Stop();
         }
     }

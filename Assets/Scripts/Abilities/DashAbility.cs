@@ -17,7 +17,7 @@ public class DashAbility : MonoBehaviour {
     private float _dashTimer;
 
     public float dashSpeed = 15f;
-    private float dashTime = 0.2f;
+    private float dashTime = 0.1f;
     private float dashCooldownTime = 0.25f;
     
     public event EventHandler OnStartDash;
@@ -108,8 +108,8 @@ public class DashAbility : MonoBehaviour {
         Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayer, false); // Disable enemy evasion
         player.ForceKeepDucking(false);
 
-        // Check if ducking when dash ends and stop immediately
-        if (player.isDucking) {
+        // Check if ducking or not moving when dash ends and stop immediately
+        if (player.isDucking || player.moveInput.x == 0 || player.facingDirection == player.moveInput.x * -1) {
             player.SetHorizontalVelocity(0f); // Stop immediately
             rigidBody.velocity = new Vector2(0f, rigidBody.velocity.y);
             keepSprintingState = false; // Prevent sprinting from resuming
