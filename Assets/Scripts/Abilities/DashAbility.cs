@@ -17,7 +17,7 @@ public class DashAbility : MonoBehaviour {
     private float _dashTimer;
 
     public float dashSpeed = 15f;
-    private float dashTime = 0.1f;
+    private float dashTime = 0.15f;
     private float dashCooldownTime = 0.25f;
     
     public event EventHandler OnStartDash;

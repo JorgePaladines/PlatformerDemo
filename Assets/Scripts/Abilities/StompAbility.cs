@@ -13,6 +13,9 @@ public class StompAbility : MonoBehaviour {
     [SerializeField] CapsuleCollider2D[] damageHitboxes;
     [SerializeField] LayerMask enemyLayerMask; // Layer for enemies to detect
 
+    [SerializeField] ParticleSystem fallingEffectPrefab;
+    ParticleSystem fallingEffect;
+
     PlayerMovement player;
     Rigidbody2D rigidBody;
     JumpAbility jumpAbility;
@@ -30,8 +33,11 @@ public class StompAbility : MonoBehaviour {
         playerAttack = GetComponent<PlayerAttack>();
     }
 
-    // Start is called before the first frame update
     void Start() {
+        if (fallingEffectPrefab != null) {
+            fallingEffect = Instantiate(fallingEffectPrefab, player.transform);
+            fallingEffect.Stop();
+        }
         player.Landed += EndStomp;
         dashAbility.OnStartDash += DisableStomp;
         dashAbility.OnEndDash += EnableStomp;
@@ -77,6 +83,7 @@ public class StompAbility : MonoBehaviour {
         if(dashAbility != null) dashAbility.DisableDash();
         if(playerAttack != null) playerAttack.DisableAttack();
         EnableHitBoxes();
+        fallingEffect?.Play();
         rigidBody.velocity = Vector2.zero; // Reset velocity before stomp
         Vector2 stompVelocity = new Vector2(rigidBody.velocity.x, -stompSpeed);
         rigidBody.velocity = stompVelocity;
@@ -106,19 +113,13 @@ public class StompAbility : MonoBehaviour {
             }
         }
 
+        fallingEffect?.Stop();
+
         // Apply horizontal velocity immediately
         rigidBody.velocity = new Vector2(player.GetHorizontalVelocity(), 0f);
     }
 
-    // Check for enemy hits
-    // private void CheckStompHit() {
-    //     Vector2 hitboxCenter = (Vector2)transform.position + Vector2.down * bodyCollider.size.y / 2;
-    //     Collider2D[] hits = Physics2D.OverlapBoxAll(hitboxCenter, stompHitboxSize, 0f, enemyLayerMask);
-        
-    //     foreach (Collider2D hit in hits) {
-    //         // Here you can add damage logic
-    //         // For example: hit.GetComponent<Enemy>().TakeDamage(stompDamage);
-    //         Debug.Log($"Stomped on: {hit.gameObject.name}");
-    //     }
-    // }
+    private void ShowFallingEffect() {
+
+    }
 }
