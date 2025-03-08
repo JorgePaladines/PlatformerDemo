@@ -11,8 +11,8 @@ public class Enemy : MonoBehaviour {
     [SerializeField] private Vector2 groundRayOffset = new Vector2(0f, -0.5f);
     [SerializeField] private Vector2 wallRayOffset = new Vector2(0.5f, 0f);
 
-    private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
+    public Rigidbody2D rb;
+    public SpriteRenderer spriteRenderer;
     public PolygonCollider2D polygonCollider;
     public CircleCollider2D damageCollider;
     private Color originalColor;
@@ -25,27 +25,7 @@ public class Enemy : MonoBehaviour {
     public bool wasGrounded = false;
     public bool isJumping = false;
     public float verticalMovementValue;
-    public float horizontalMovementValue;
-
-    [Header("Animation")]
-    [SerializeField] private Animator animator;
-
-    [Header("Movement Settings")]
-    private float startTime;
-    private float idleInterval = 2f;
-    [SerializeField] private float jumpForce = 5f;
-    [SerializeField] private float horizontalJumpForce = 3f;
-    
-    public enum EnemyState {
-        Idle,
-        JumpStart,
-        Jumping,
-        ToFall,
-        Falling,
-        Landing
-    }
-    
-    public EnemyState currentState = EnemyState.Idle;
+    public float horizontalMovementValue;    
     
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -57,14 +37,11 @@ public class Enemy : MonoBehaviour {
         playerLayer = LayerMask.GetMask("Player");
 
         originalColor = spriteRenderer.color;
-
-        if (animator == null) animator = GetComponent<Animator>();
     }
 
     private void Start() {
         polygonCollider.enabled = true;
         damageCollider.enabled = false;
-        StartMovementCycle();
     }
     
     private void Update() {
@@ -73,75 +50,6 @@ public class Enemy : MonoBehaviour {
 
         wasGrounded = isGrounded;
         isGrounded = IsGrounded();
-        
-        HandleStateTransitions();
-    }
-
-    private void StartMovementCycle() {
-        startTime = Random.Range(0.5f, 3f);
-        facingRight = Random.Range(0, 2) * 2 - 1 == 1;
-        if(!facingRight){
-            spriteRenderer.flipX = !facingRight;
-        }
-        
-        Invoke("startIdleCycle", startTime);
-    }
-    
-    // Handle state transitions based on physics and grounding
-    private void HandleStateTransitions() {
-        // Reaching highest point of jump
-        if (isJumping && !isGrounded && rb.velocity.y <= 0.5 && currentState == EnemyState.Jumping) {
-            SetState(EnemyState.ToFall);
-        }
-
-        // Landing detection
-        if (!wasGrounded && isGrounded && isJumping) {
-            LandingSequence();
-        }
-    }
-
-    private void SetState(EnemyState newState) {
-        currentState = newState;
-        animator.SetTrigger(newState.ToString());
-        polygonCollider.enabled = newState == EnemyState.Idle || newState == EnemyState.JumpStart || newState == EnemyState.Landing;
-        damageCollider.enabled = !polygonCollider.enabled;
-    }
-
-    public void Idle(){
-        Debug.Log("Idle");
-        SetState(EnemyState.Idle);
-        startIdleCycle();
-    }
-
-    public void startIdleCycle(){
-        Debug.Log("Start Idle Cycle");
-        StartCoroutine(IdleCycle());
-    }
-
-    private IEnumerator IdleCycle() {
-        yield return new WaitForSeconds(idleInterval);
-        SetState(EnemyState.JumpStart);
-    }
-
-    public void PerformJump() {
-        SetState(EnemyState.Jumping);
-        
-        // Apply jump force
-        int direction = facingRight ? 1 : -1;
-        rb.velocity = new Vector2(horizontalJumpForce * direction, jumpForce);
-        isJumping = true;
-    }
-
-    public void StayFalling(){
-        SetState(EnemyState.Falling);
-    }
-
-    private void LandingSequence() {
-        isJumping = false;
-        SetState(EnemyState.Landing);
-        
-        // Stop horizontal movement when landing
-        rb.velocity = new Vector2(0, rb.velocity.y);
     }
 
     public void TakeDamage(){
@@ -162,7 +70,7 @@ public class Enemy : MonoBehaviour {
         Destroy(gameObject);
     }
 
-    private bool IsGrounded() {
+    public bool IsGrounded() {
         // Adjust the origin position based on the offset
         Vector2 rayOrigin = (Vector2)transform.position + new Vector2(groundRayOffset.x * (facingRight ? 1 : -1), groundRayOffset.y);
         
@@ -180,7 +88,7 @@ public class Enemy : MonoBehaviour {
         return hit.collider != null;
     }
     
-    private bool isObstacleAhead() {
+    public bool isObstacleAhead() {
         // Determine the direction to check based on facing direction
         Vector2 direction = facingRight ? Vector2.right : Vector2.left;
         
@@ -204,27 +112,7 @@ public class Enemy : MonoBehaviour {
         return hit.collider != null;
     }
     
-    private void Flip() {
-        facingRight = !facingRight;
-        spriteRenderer.flipX = !facingRight;
-    }
     
-    private void OnCollisionEnter2D(Collision2D collision) {
-        int collidedLayer = collision.gameObject.layer;
-        LayerMask targetLayers = LayerMask.GetMask("Player", "LevelGeometry");
-
-        // Check if we collided with the player
-        if (targetLayers == (targetLayers | (1 << collidedLayer)) && isObstacleAhead()) {
-            // If jumping and hit player from the side, change direction
-            if (!isGrounded && isJumping) {
-                Flip();
-                
-                // Apply small backwards impulse to prevent sticking
-                int direction = facingRight ? 1 : -1;
-                rb.velocity = new Vector2(horizontalJumpForce * direction * 0.5f, rb.velocity.y);
-            }
-        }
-    }
     
     private void OnDrawGizmos() {
         bool faceRight = facingRight;

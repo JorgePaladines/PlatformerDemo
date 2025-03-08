@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 3500171718079072669}
   - component: {fileID: 6032198761096754169}
   - component: {fileID: 1828303562949129968}
+  - component: {fileID: 4729689233971435908}
   m_Layer: 8
   m_Name: Blue Slime
   m_TagString: Untagged
@@ -248,9 +249,7 @@ MonoBehaviour:
   wallRayLength: 0.2
   groundRayOffset: {x: 0, y: -0.5}
   wallRayOffset: {x: 0.5, y: 0}
-  animator: {fileID: 2916014666820519355}
-  jumpForce: 5
-  horizontalJumpForce: 3
+  rb: {fileID: 0}
   polygonCollider: {fileID: 0}
   damageCollider: {fileID: 0}
   invulnerabilityDuration: 0.3
@@ -262,7 +261,6 @@ MonoBehaviour:
   isJumping: 0
   verticalMovementValue: 0
   horizontalMovementValue: 0
-  currentState: 0
 --- !u!114 &1828303562949129968
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,3 +278,19 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 6255395539266147790, guid: 816c7c138b66d764aa11cf66f8de9a87, type: 3}
   healthBarOffset: {x: 0, y: 0.7, z: 0}
   healthBarDisplayTime: 3
+--- !u!114 &4729689233971435908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8561959302594203627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82856d3c6b1c53e418b0add093f060a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jumpForce: 5
+  horizontalJumpForce: 3
+  animator: {fileID: 2916014666820519355}
+  currentState: 0
