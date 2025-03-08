@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundRayLength: 0.1
-  wallRayLength: 0.1
+  wallRayLength: 0.2
   groundRayOffset: {x: 0, y: -0.5}
   wallRayOffset: {x: 0.5, y: 0}
   animator: {fileID: 8745611154118263750}
