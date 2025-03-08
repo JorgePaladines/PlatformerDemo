@@ -1205,7 +1205,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.23116708, y: -1.7899766, z: -9.907001}
+  m_LocalPosition: {x: -0.23116708, y: -1.7899666, z: -9.907001}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4931,7 +4931,7 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.06158787}
+  m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.73996526, y: 1.5680553}
   m_Direction: 0
 --- !u!50 &1952166926
@@ -5138,7 +5138,7 @@ MonoBehaviour:
   runSpeed: 5
   crouchSpeed: 2
   customGravity: 4
-  raycastDistance: 0.1
+  moveInput: {x: 0, y: 0}
   levelGeometryLayer:
     serializedVersion: 2
     m_Bits: 64
@@ -5157,6 +5157,7 @@ MonoBehaviour:
   _inAirLastFrame: 0
   left: 0
   right: 0
+  above: 0
   canMove: 1
   canDuck: 1
   normalDeceleration: 20

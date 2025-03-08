@@ -31,14 +31,16 @@ public class JumpAbility : MonoBehaviour {
         if(!canJump || player == null) return;
         
         if (context.started) {
-            if(player.isGrounded && !player.keepDucking) {
+            if(player.isGrounded && !player.above) {
                 Jumped?.Invoke(this, EventArgs.Empty);
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, 0f);
                 rigidBody.velocity += new Vector2(0f, jumpSpeed);
                 if(rigidBody.gravityScale == 0){
                     player.EnableGravity();
                 }
+                player.ForceKeepDucking(false);
             }
-            else if(canDoubleJump){
+            else if(canDoubleJump && !player.isGrounded && !player.isDucking){
                 OnDoubleJump?.Invoke(this, EventArgs.Empty);
                 canDoubleJump = false;
                 rigidBody.velocity = new Vector2(rigidBody.velocity.x, 0f); // Reset Y velocity to avoid stacking force

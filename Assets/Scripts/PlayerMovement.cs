@@ -10,12 +10,11 @@ public class PlayerMovement : MonoBehaviour {
     public float externalSpeed { get; private set; }
     [SerializeField] float customGravity  = 4f;
 
-    PlayerAttack playerAttack;
-    public Vector2 moveInput { get; private set; }
+    public Vector2 moveInput;
     Rigidbody2D rigidBody;
     public CapsuleCollider2D bodyCollider { get; private set; }
     private Vector2 _originalColliderSize;
-    [SerializeField] float raycastDistance = 0.1f;
+    private float raycastDistance = 0.1f;
     [SerializeField] LayerMask levelGeometryLayer;
     [SerializeField] LayerMask enemyLayer;
 
@@ -32,6 +31,7 @@ public class PlayerMovement : MonoBehaviour {
     public bool _inAirLastFrame;
     public bool left;
     public bool right;
+    public bool above;
     #endregion
 
     #region restrictive properties
@@ -54,7 +54,6 @@ public class PlayerMovement : MonoBehaviour {
     void Start()  {
         rigidBody = GetComponent<Rigidbody2D>();
         bodyCollider = GetComponent<CapsuleCollider2D>();
-        playerAttack = GetComponent<PlayerAttack>();
 
         rigidBody.gravityScale = customGravity;
         _originalColliderSize = bodyCollider.size;
@@ -69,10 +68,13 @@ public class PlayerMovement : MonoBehaviour {
 
     void Update() {
         Run();
-        CheckDirection();
         CheckGrounded();
         Ducking();
+        CheckDirection();
+        CheckAbove();
         CheckSides();
+
+        
 
         horizontalMovementValue = rigidBody.velocity.x;
         verticalMovementValue = rigidBody.velocity.y;
@@ -194,9 +196,13 @@ public class PlayerMovement : MonoBehaviour {
             CapsuleDirection2D.Vertical, 
             0f, 
             Vector2.down, 
-            raycastDistance, 
+            raycastDistance/2, 
             levelGeometryLayer | enemyLayer
         );
+
+        Vector2 colliderCenter = bodyCollider.bounds.center;
+        Vector2 colliderSize = bodyCollider.size;
+        Debug.DrawRay(new Vector2(colliderCenter.x, colliderCenter.y - colliderSize.y / 2), Vector2.down * raycastDistance/2, Color.green);
 
         if(groundRayCast.collider){
             isGrounded = true;
@@ -207,13 +213,38 @@ public class PlayerMovement : MonoBehaviour {
         }
         else{
             isGrounded = false;
+            isDucking = false;
         }
+    }
+
+    private void CheckAbove() {
+        RaycastHit2D hitCeilingHigh = Physics2D.CapsuleCast(
+            new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y + (_originalColliderSize.y / 2)),
+            _originalColliderSize,
+            CapsuleDirection2D.Vertical,
+            0f,
+            Vector2.up,
+            raycastDistance,
+            levelGeometryLayer
+        );
+
+        RaycastHit2D hitCeilingLow = Physics2D.CapsuleCast(
+            bodyCollider.bounds.center,
+            bodyCollider.size,
+            CapsuleDirection2D.Vertical,
+            0f,
+            Vector2.up,
+            raycastDistance,
+            levelGeometryLayer
+        );
+
+        above = hitCeilingHigh.collider || hitCeilingLow.collider ? true : false;
     }
     
     private void Ducking() {
         if (!canDuck) return;
 
-        if (!isGrounded && isDucking) {
+        if (!isGrounded) {
             ExitCrouch?.Invoke(this, EventArgs.Empty);
             isDucking = false;
             if (bodyCollider.size != _originalColliderSize) {
@@ -228,27 +259,7 @@ public class PlayerMovement : MonoBehaviour {
             isDucking = true;
         }
         else if (moveInput.y >= 0 && isGrounded && isDucking) {
-            RaycastHit2D hitCeilingHigh = Physics2D.CapsuleCast(
-                new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y + (_originalColliderSize.y / 2)),
-                _originalColliderSize,
-                CapsuleDirection2D.Vertical,
-                0f,
-                Vector2.up,
-                raycastDistance,
-                levelGeometryLayer
-            );
-
-            RaycastHit2D hitCeilingLow = Physics2D.CapsuleCast(
-                bodyCollider.bounds.center,
-                bodyCollider.size,
-                CapsuleDirection2D.Vertical,
-                0f,
-                Vector2.up,
-                raycastDistance,
-                levelGeometryLayer
-            );
-
-            if (!hitCeilingHigh.collider && !hitCeilingLow.collider && !keepDucking) {
+            if(!above && !keepDucking){
                 ExitCrouch?.Invoke(this, EventArgs.Empty);
                 bodyCollider.size = _originalColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);

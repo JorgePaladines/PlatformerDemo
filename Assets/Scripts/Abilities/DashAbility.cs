@@ -58,9 +58,12 @@ public class DashAbility : MonoBehaviour {
 
     public void TriggerDash() {
         if (player == null) return;
+
         bool airDash = canDash && !player.isGrounded && !player.isDucking && player.moveInput.y >= 0;
-        bool groundDash = canDash && (player.isGrounded || player.isDucking) && player.moveInput.y >= 0;
-        bool ableToDash = airDash || groundDash;
+        bool groundDash = canDash && player.isGrounded && !player.isDucking && player.moveInput.y >= 0;
+        bool crouchDash = canDash && player.isGrounded && player.isDucking;
+        bool ableToDash = airDash || (groundDash && !crouchDash) || (!groundDash && crouchDash);
+
         if (ableToDash && _dashTimer <= 0) {
             StartCoroutine(Dash());
         }
@@ -75,7 +78,7 @@ public class DashAbility : MonoBehaviour {
         if (!player.isGrounded) canDash = false;
 
         // Keep ducking during dash
-        if(player.isDucking && player.isGrounded) player.ForceKeepDucking(true);
+        if(player.isGrounded && player.isDucking) player.ForceKeepDucking(true);
 
         OnStartDash?.Invoke(this, EventArgs.Empty);
         player.DisableGravity();
