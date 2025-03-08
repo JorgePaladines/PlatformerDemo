@@ -184,7 +184,7 @@ public class PlayerMovement : MonoBehaviour {
             facingDirection = 1;
         }
 
-        playerDirection = Math.Sign(moveInput.x) >= 0 ? 1 : -1;
+        playerDirection = Math.Sign(moveInput.x);
     }
 
     private void CheckGrounded(){
@@ -220,7 +220,6 @@ public class PlayerMovement : MonoBehaviour {
                 bodyCollider.size = _originalColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);
             }
-            
         }
         else if (moveInput.y < 0 && Math.Abs(_currentHorizontalVelocity) <= crouchSpeed && isGrounded && !isDucking) {
             EnterCrouch?.Invoke(this, EventArgs.Empty);

@@ -40,18 +40,15 @@ public class PlayerAttack : MonoBehaviour {
 
     private void Start(){
         player = GetComponent<PlayerMovement>();
-        spriteRenderer = player.GetComponentInChildren<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         jumpAbility = GetComponent<JumpAbility>();
         dashAbility = GetComponent<DashAbility>();
         stompAbility = GetComponent<StompAbility>();
         wallJumpAbility = GetComponent<WallJumpAbility>();
         rhythmManager = FindAnyObjectByType<RhythmManager>();
 
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null) {
-            audioSource = gameObject.AddComponent<AudioSource>();
-            audioSource.clip = attackSound;
-        }
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = attackSound;
 
         attackHitBox?.gameObject.SetActive(false);
         airHitBox?.gameObject.SetActive(false);

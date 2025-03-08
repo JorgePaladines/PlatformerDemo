@@ -31,9 +31,12 @@ public class JumpAbility : MonoBehaviour {
         if(!canJump || player == null) return;
         
         if (context.started) {
-            if(player.isGrounded){
+            if(player.isGrounded && !player.keepDucking) {
                 Jumped?.Invoke(this, EventArgs.Empty);
                 rigidBody.velocity += new Vector2(0f, jumpSpeed);
+                if(rigidBody.gravityScale == 0){
+                    player.EnableGravity();
+                }
             }
             else if(canDoubleJump){
                 OnDoubleJump?.Invoke(this, EventArgs.Empty);
@@ -41,8 +44,6 @@ public class JumpAbility : MonoBehaviour {
                 rigidBody.velocity = new Vector2(rigidBody.velocity.x, 0f); // Reset Y velocity to avoid stacking force
                 rigidBody.velocity += new Vector2(0f, jumpSpeed * doubleJumpMultiplier);
             }
-
-            // RhythmManager.Instance.RegisterAction(false);
         }
         else if (context.canceled) {
             if (rigidBody.velocity.y > 0) {

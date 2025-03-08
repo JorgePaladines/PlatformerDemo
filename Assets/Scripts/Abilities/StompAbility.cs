@@ -15,12 +15,18 @@ public class StompAbility : MonoBehaviour {
 
     [SerializeField] ParticleSystem fallingEffectPrefab;
     ParticleSystem fallingEffect;
+    [SerializeField] ParticleSystem powerStompEffectPrefab;
+    ParticleSystem powerStompEffect;
 
     PlayerMovement player;
     Rigidbody2D rigidBody;
     JumpAbility jumpAbility;
     DashAbility dashAbility;
     PlayerAttack playerAttack;
+
+    private AudioSource audioSource;
+    [SerializeField] AudioClip stompSound;
+    [SerializeField] AudioClip powerStompSound;
 
     public event EventHandler OnStartStomp;
     public event EventHandler OnEndStomp;
@@ -31,12 +37,18 @@ public class StompAbility : MonoBehaviour {
         jumpAbility = GetComponent<JumpAbility>();
         dashAbility = GetComponent<DashAbility>();
         playerAttack = GetComponent<PlayerAttack>();
+        audioSource = gameObject.AddComponent<AudioSource>();
+        audioSource.clip = stompSound;
     }
 
     void Start() {
         if (fallingEffectPrefab != null) {
             fallingEffect = Instantiate(fallingEffectPrefab, player.transform);
             fallingEffect.Stop();
+        }
+        if(powerStompEffectPrefab != null) {
+            powerStompEffect = Instantiate(powerStompEffectPrefab, player.transform);
+            powerStompEffect.Stop();
         }
         player.Landed += EndStomp;
         dashAbility.OnStartDash += DisableStomp;
@@ -69,7 +81,7 @@ public class StompAbility : MonoBehaviour {
         if(!canStomp || player == null) return;
         if (context.started) {
             bool isDashing = dashAbility?.isDashing ?? false;
-            if(!isDashing && canStomp && !player.isGrounded && player.moveInput.y < 0 && !isStomping){
+            if(!isDashing && canStomp && !player.isGrounded && !player.isDucking && player.moveInput.y < 0 && !isStomping){
                 StartStomp();
             }
         }
@@ -93,6 +105,7 @@ public class StompAbility : MonoBehaviour {
         if(!isStomping) return;
 
         OnEndStomp?.Invoke(this, EventArgs.Empty);
+        playerAttack.onBeat = RhythmManager.Instance.RegisterAction(true);
         isStomping = false;
         player.EnableMove();
         player.SetExternalSpeed(0f);
@@ -114,12 +127,18 @@ public class StompAbility : MonoBehaviour {
         }
 
         fallingEffect?.Stop();
+        bool powerAttack = RhythmManager.Instance.usePowerAttack;
+        if(powerAttack){
+            audioSource.clip = powerStompSound;
+            powerStompEffect?.Play();
+        }
+        else {
+            audioSource.clip = stompSound;
+        }
+        
+        audioSource.Play();
 
         // Apply horizontal velocity immediately
         rigidBody.velocity = new Vector2(player.GetHorizontalVelocity(), 0f);
-    }
-
-    private void ShowFallingEffect() {
-
     }
 }

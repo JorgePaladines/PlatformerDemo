@@ -57,6 +57,5 @@ public class AnimationController : MonoBehaviour {
         animator.SetTrigger("powerAttack");
     }
 
-    void EndAttack(object sender, EventArgs e) {
-    }
+    void EndAttack(object sender, EventArgs e) { }
 }

@@ -7,7 +7,7 @@ using System;
 public class DashAbility : MonoBehaviour {
     PlayerMovement player;
     Rigidbody2D rigidBody;
-    PlayerAttack playerAttack;
+    JumpAbility jumpAbility;
     private int enemyLayer;
 
     public bool canDash { get; private set; }
@@ -26,7 +26,7 @@ public class DashAbility : MonoBehaviour {
     void Awake() {
         player = GetComponent<PlayerMovement>();
         rigidBody = GetComponent<Rigidbody2D>();
-        playerAttack = GetComponent<PlayerAttack>();
+        jumpAbility = GetComponent<JumpAbility>();
         enemyLayer = LayerMask.NameToLayer("Enemy");
     }
     
@@ -58,8 +58,8 @@ public class DashAbility : MonoBehaviour {
 
     public void TriggerDash() {
         if (player == null) return;
-        bool airDash = canDash && !player.isGrounded && player.moveInput.y >= 0;
-        bool groundDash = canDash && (player.isGrounded || player.isDucking);
+        bool airDash = canDash && !player.isGrounded && !player.isDucking && player.moveInput.y >= 0;
+        bool groundDash = canDash && (player.isGrounded || player.isDucking) && player.moveInput.y >= 0;
         bool ableToDash = airDash || groundDash;
         if (ableToDash && _dashTimer <= 0) {
             StartCoroutine(Dash());
@@ -75,7 +75,7 @@ public class DashAbility : MonoBehaviour {
         if (!player.isGrounded) canDash = false;
 
         // Keep ducking during dash
-        if(player.isDucking) player.ForceKeepDucking(true);
+        if(player.isDucking && player.isGrounded) player.ForceKeepDucking(true);
 
         OnStartDash?.Invoke(this, EventArgs.Empty);
         player.DisableGravity();
@@ -85,7 +85,7 @@ public class DashAbility : MonoBehaviour {
 
         player.DisableMove();
         player.DisableDuck();
-        // if(playerAttack != null) playerAttack.DisableAttack();
+        // jumpAbility?.DisableJump();
         
         // Enable sprinting after dash ends
         keepSprintingState = true;
@@ -118,7 +118,7 @@ public class DashAbility : MonoBehaviour {
 
         player.EnableMove();
         player.EnableDuck();
-        // if(playerAttack != null) playerAttack.EnableAttack();
+        // jumpAbility?.EnableJump();
 
         yield return new WaitForSeconds(dashCooldownTime); // Wait for cooldown
     }

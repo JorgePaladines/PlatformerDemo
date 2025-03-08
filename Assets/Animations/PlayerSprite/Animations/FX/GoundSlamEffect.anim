@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: GroundSlam
+  m_Name: GoundSlamEffect
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -21,18 +21,26 @@ AnimationClip:
   - serializedVersion: 2
     curve:
     - time: 0
-      value: {fileID: 21300000, guid: 5a1b1d8d0f45a6c4c9c0a4478cd32cfd, type: 3}
+      value: {fileID: 21300000, guid: 2c74be351005bac488b4db5494c97af9, type: 3}
+    - time: 0.041666668
+      value: {fileID: 21300000, guid: f14686b1bf9ecf4479ee1cee608bc4f6, type: 3}
     - time: 0.083333336
-      value: {fileID: 21300000, guid: 24cdcdbdc83c74940921d69df45db11d, type: 3}
+      value: {fileID: 21300000, guid: 84437e85d085c0c499a305c1282c0ad9, type: 3}
+    - time: 0.125
+      value: {fileID: 21300000, guid: 6a069c0836cf3b04db2ee04e0234aa52, type: 3}
     - time: 0.16666667
-      value: {fileID: 21300000, guid: 020b5e18d02fddc409504d10b6aa8fa7, type: 3}
+      value: {fileID: 21300000, guid: fd22362fa17bb734a8c113f9e6d4328c, type: 3}
+    - time: 0.20833333
+      value: {fileID: 21300000, guid: 52ba4ef605812984fab53e2f6eb54903, type: 3}
+    - time: 0.25
+      value: {fileID: 21300000, guid: cf0f9254253f0604faf7148ba5b653dd, type: 3}
     attribute: m_Sprite
     path: 
     classID: 212
     script: {fileID: 0}
     flags: 2
-  m_SampleRate: 12
-  m_WrapMode: 2
+  m_SampleRate: 24
+  m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
@@ -48,15 +56,19 @@ AnimationClip:
       isIntCurve: 0
       isSerializeReferenceCurve: 0
     pptrCurveMapping:
-    - {fileID: 21300000, guid: 5a1b1d8d0f45a6c4c9c0a4478cd32cfd, type: 3}
-    - {fileID: 21300000, guid: 24cdcdbdc83c74940921d69df45db11d, type: 3}
-    - {fileID: 21300000, guid: 020b5e18d02fddc409504d10b6aa8fa7, type: 3}
+    - {fileID: 21300000, guid: 2c74be351005bac488b4db5494c97af9, type: 3}
+    - {fileID: 21300000, guid: f14686b1bf9ecf4479ee1cee608bc4f6, type: 3}
+    - {fileID: 21300000, guid: 84437e85d085c0c499a305c1282c0ad9, type: 3}
+    - {fileID: 21300000, guid: 6a069c0836cf3b04db2ee04e0234aa52, type: 3}
+    - {fileID: 21300000, guid: fd22362fa17bb734a8c113f9e6d4328c, type: 3}
+    - {fileID: 21300000, guid: 52ba4ef605812984fab53e2f6eb54903, type: 3}
+    - {fileID: 21300000, guid: cf0f9254253f0604faf7148ba5b653dd, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.25
+    m_StopTime: 0.29166666
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -75,4 +87,11 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0.25
+    functionName: DestroyEffect
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0

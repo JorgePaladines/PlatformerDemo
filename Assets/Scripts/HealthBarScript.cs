@@ -116,11 +116,13 @@ public class HealthBarScript : MonoBehaviour {
                 if(rhythmManager.usePowerAttack){
                     damageAmount = hitBox.GetDamage() * hitBox.GetMultiplier();
                 }
-                else if(!rhythmManager.usePowerAttack && !playerAttack.onBeat) {
-                    damageAmount = hitBox.GetDamage() / hitBox.GetDivider();
-                }
-                else{
-                    damageAmount = hitBox.GetDamage();
+                else {
+                    if(!playerAttack.onBeat) {
+                        damageAmount = hitBox.GetDamage() / hitBox.GetDivider();
+                    }
+                    else{
+                        damageAmount = hitBox.GetDamage();
+                    }
                 }
                 TakeDamage(damageAmount);
             }
