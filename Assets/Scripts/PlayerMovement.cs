@@ -245,7 +245,9 @@ public class PlayerMovement : MonoBehaviour {
         if (!canDuck) return;
 
         if (!isGrounded) {
-            ExitCrouch?.Invoke(this, EventArgs.Empty);
+            if(!_inAirLastFrame){
+                ExitCrouch?.Invoke(this, EventArgs.Empty);
+            }
             isDucking = false;
             if (bodyCollider.size != _originalColliderSize) {
                 bodyCollider.size = _originalColliderSize;

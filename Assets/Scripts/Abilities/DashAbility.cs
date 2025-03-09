@@ -7,7 +7,6 @@ using System;
 public class DashAbility : MonoBehaviour {
     PlayerMovement player;
     Rigidbody2D rigidBody;
-    JumpAbility jumpAbility;
     private int enemyLayer;
 
     public bool canDash { get; private set; }
@@ -26,7 +25,6 @@ public class DashAbility : MonoBehaviour {
     void Awake() {
         player = GetComponent<PlayerMovement>();
         rigidBody = GetComponent<Rigidbody2D>();
-        jumpAbility = GetComponent<JumpAbility>();
         enemyLayer = LayerMask.NameToLayer("Enemy");
     }
     
@@ -96,7 +94,7 @@ public class DashAbility : MonoBehaviour {
         player.SetExternalSpeed(dashSpeed);
 
         // Apply dash velocity
-        int directionToDash = player.moveInput.x == 0 ? player.facingDirection : player.playerDirection;
+        int directionToDash = player.playerDirection == 0 ? player.facingDirection : player.playerDirection;
         player.LockFacingDirection(directionToDash);
         float newVelocity = dashSpeed * directionToDash;
         player.SetHorizontalVelocity(newVelocity);
