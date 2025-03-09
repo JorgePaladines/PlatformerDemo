@@ -250,6 +250,7 @@ MonoBehaviour:
   groundRayOffset: {x: 0, y: -0.5}
   wallRayOffset: {x: 0.5, y: 0}
   rb: {fileID: 0}
+  spriteRenderer: {fileID: 0}
   polygonCollider: {fileID: 0}
   damageCollider: {fileID: 0}
   invulnerabilityDuration: 0.3
@@ -278,6 +279,7 @@ MonoBehaviour:
   healthBarPrefab: {fileID: 6255395539266147790, guid: 816c7c138b66d764aa11cf66f8de9a87, type: 3}
   healthBarOffset: {x: 0, y: 0.7, z: 0}
   healthBarDisplayTime: 3
+  damagePointsPrefab: {fileID: 8535205810139699020, guid: 89d45ebcb9a1d124991070ce62d99c12, type: 3}
 --- !u!114 &3861976474634087740
 MonoBehaviour:
   m_ObjectHideFlags: 0

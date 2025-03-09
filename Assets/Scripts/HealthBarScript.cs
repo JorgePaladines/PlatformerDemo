@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +17,8 @@ public class HealthBarScript : MonoBehaviour {
     [SerializeField] private GameObject healthBarPrefab; // This should be a prefab with a Slider component
     [SerializeField] private Vector3 healthBarOffset = new Vector3(0, 1.2f, 0);
     [SerializeField] private float healthBarDisplayTime = 3f;
-    // [SerializeField] private Vector2 healthBarSize = new Vector2(80f, 20f);
+    [SerializeField] private GameObject damagePointsPrefab;
+    private GameObject enemyDamagePoints;
     
     private Enemy enemy;
     private GameObject healthBarInstance;
@@ -31,15 +34,12 @@ public class HealthBarScript : MonoBehaviour {
     }
     
     private void InstantiateHealthBar() {
-        // Instantiate the slider prefab as a child of this GameObject
         healthBarInstance = Instantiate(healthBarPrefab, transform);
-        // healthBarInstance = healthBarPrefab;
         
         // Position it above the enemy (the RectTransform will be positioned relative to the parent)
         RectTransform rectTransform = healthBarInstance.GetComponentInChildren<RectTransform>();
         if (rectTransform != null) {
             rectTransform.localPosition = healthBarOffset;
-            // rectTransform.sizeDelta = healthBarSize;
         }
         
         // Get reference to the Slider component
@@ -65,6 +65,7 @@ public class HealthBarScript : MonoBehaviour {
         healthSlider.value = currentHealth;
 
         ShowHealthBar();
+        ShowDamagePoints(damage);
 
         if (currentHealth <= 0) {
             enemy.Die();
@@ -73,7 +74,17 @@ public class HealthBarScript : MonoBehaviour {
             StartCoroutine(InvulnerabilityCoroutine());
         }
     }
-    
+
+    private void ShowDamagePoints(float damage) {
+        if(currentHealth > 0){
+            if(enemyDamagePoints != null){
+                Destroy(enemyDamagePoints);
+            }
+            enemyDamagePoints = Instantiate(damagePointsPrefab, transform.position, Quaternion.identity, transform);
+            enemyDamagePoints.GetComponent<TextMeshPro>().text = damage.ToString();
+        }
+    }
+
     private void ShowHealthBar() {
         healthBarInstance.SetActive(true);
         if(hideHealthBarCoroutine != null) StopCoroutine(hideHealthBarCoroutine);
@@ -85,19 +96,6 @@ public class HealthBarScript : MonoBehaviour {
         healthBarInstance.SetActive(false);
         hideHealthBarCoroutine = null;
     }
-    
-    // Public method to heal the enemy if needed
-    // public void Heal(int amount)
-    // {
-    //     currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
-        
-    //     if (healthSlider != null)
-    //     {
-    //         healthSlider.value = currentHealth;
-    //     }
-        
-    //     ShowHealthBar();
-    // }
 
     private IEnumerator InvulnerabilityCoroutine() {
         isInvulnerable = true;
