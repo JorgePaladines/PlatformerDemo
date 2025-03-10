@@ -41,7 +41,9 @@ public class Enemy : MonoBehaviour {
 
     private void Start() {
         polygonCollider.enabled = true;
-        damageCollider.enabled = false;
+        if(damageCollider != null){
+            damageCollider.enabled = false;
+        }
     }
     
     private void Update() {

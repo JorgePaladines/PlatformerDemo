@@ -28,10 +28,6 @@ public class RhythmManager : MonoBehaviour {
     [SerializeField] double lastBeatTimeCheck; // Saved next beat time when the player hit
     [Tooltip("Check the time when the player hit this time")]
     public double timeHit;
-
-    [Header("Audio Feedback")]
-    [SerializeField] private AudioClip beatSound;
-    [SerializeField] [Range(0, 1)] private float soundVolume = 0.25f;
     private AudioSource audioSource;
 
     public bool usePowerAttack { get; private set; } = false;

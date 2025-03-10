@@ -31,7 +31,6 @@ public class PlayerAttack : MonoBehaviour {
     EmissionModule emission;
     [SerializeField] AudioClip attackSound;
     [SerializeField] AudioClip powerAttackSound;
-    [SerializeField] AudioClip extraPowerSound;
     private AudioSource audioSource;
 
     public event EventHandler OnAttackStart;

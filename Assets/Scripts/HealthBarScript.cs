@@ -15,15 +15,15 @@ public class HealthBarScript : MonoBehaviour {
     
     [Header("Health Bar UI")]
     [SerializeField] private GameObject healthBarPrefab; // This should be a prefab with a Slider component
-    [SerializeField] private Vector3 healthBarOffset = new Vector3(0, 1.2f, 0);
+    [SerializeField] private Vector3 healthBarOffset = new Vector3(0f, 1.2f, 0f);
     [SerializeField] private float healthBarDisplayTime = 3f;
     [SerializeField] private GameObject damagePointsPrefab;
-    private GameObject enemyDamagePoints;
     
     private Enemy enemy;
     private GameObject healthBarInstance;
     private Slider healthSlider;
     private Coroutine hideHealthBarCoroutine;
+    private GameObject enemyDamagePoints;
     
     private void Awake() {
         rhythmManager = FindAnyObjectByType<RhythmManager>();
@@ -38,9 +38,7 @@ public class HealthBarScript : MonoBehaviour {
         
         // Position it above the enemy (the RectTransform will be positioned relative to the parent)
         RectTransform rectTransform = healthBarInstance.GetComponentInChildren<RectTransform>();
-        if (rectTransform != null) {
-            rectTransform.localPosition = healthBarOffset;
-        }
+        rectTransform.localPosition = healthBarOffset;
         
         // Get reference to the Slider component
         healthSlider = healthBarInstance.GetComponentInChildren<Slider>();
@@ -58,7 +56,6 @@ public class HealthBarScript : MonoBehaviour {
     }
     
     public void TakeDamage(float damage) {
-        Debug.Log("Enemy took " + damage + " damage!");
         if (isInvulnerable) return;
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
@@ -80,8 +77,10 @@ public class HealthBarScript : MonoBehaviour {
             if(enemyDamagePoints != null){
                 Destroy(enemyDamagePoints);
             }
-            enemyDamagePoints = Instantiate(damagePointsPrefab, transform.position, Quaternion.identity, transform);
-            enemyDamagePoints.GetComponent<TextMeshPro>().text = damage.ToString();
+            enemyDamagePoints = Instantiate(damagePointsPrefab, transform);
+            enemyDamagePoints.GetComponentInChildren<TextMeshPro>().text = damage.ToString();
+            RectTransform rectTransform = enemyDamagePoints.GetComponent<RectTransform>();
+            rectTransform.localPosition = healthBarOffset;
         }
     }
 
