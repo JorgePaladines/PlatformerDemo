@@ -73,6 +73,7 @@ public class HealthBarScript : MonoBehaviour {
     }
 
     private void ShowDamagePoints(float damage) {
+        if(damagePointsPrefab == null) return;
         if(currentHealth > 0){
             if(enemyDamagePoints != null){
                 Destroy(enemyDamagePoints);

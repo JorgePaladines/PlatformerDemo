@@ -59,8 +59,8 @@ public class SlimeMovement : MonoBehaviour {
     private void SetState(EnemyState newState) {
         currentState = newState;
         animator.SetTrigger(newState.ToString());
-        enemy.polygonCollider.enabled = newState == EnemyState.Idle || newState == EnemyState.JumpStart || newState == EnemyState.Landing;
-        enemy.damageCollider.enabled = !enemy.polygonCollider.enabled;
+        enemy.bodyCollider.enabled = newState == EnemyState.Idle || newState == EnemyState.JumpStart || newState == EnemyState.Landing;
+        enemy.damageCollider.enabled = !enemy.bodyCollider.enabled;
     }
 
     public void Idle(){

@@ -13,7 +13,11 @@ public class PlayerMovement : MonoBehaviour {
     public Vector2 moveInput;
     Rigidbody2D rigidBody;
     public CapsuleCollider2D bodyCollider { get; private set; }
-    private Vector2 _originalColliderSize;
+    private Vector2 standingColliderSize;
+    private Vector3 standingColliderCenter;
+    private Vector2 crouchColliderSize;
+    private Vector3 crouchColliderCenter;
+    // private Vector2 crouchColliderOffset;
     private float raycastDistance = 0.1f;
     [SerializeField] LayerMask levelGeometryLayer;
     [SerializeField] LayerMask enemyLayer;
@@ -56,7 +60,12 @@ public class PlayerMovement : MonoBehaviour {
         bodyCollider = GetComponent<CapsuleCollider2D>();
 
         rigidBody.gravityScale = customGravity;
-        _originalColliderSize = bodyCollider.size;
+
+        standingColliderSize = new Vector2(bodyCollider.size.x, bodyCollider.size.y);
+        standingColliderCenter = new Vector3(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y, bodyCollider.bounds.center.z);
+        crouchColliderSize = new Vector2(standingColliderSize.x, standingColliderSize.y / 2);
+        crouchColliderCenter = new Vector3(standingColliderCenter.x, standingColliderCenter.y - bodyCollider.size.y / 4);
+        // crouchColliderOffset = new Vector2(0f, -standingColliderSize.y / 2);
 
         canMove = true;
         isGrounded = false;
@@ -73,8 +82,6 @@ public class PlayerMovement : MonoBehaviour {
         CheckDirection();
         CheckAbove();
         CheckSides();
-
-        
 
         horizontalMovementValue = rigidBody.velocity.x;
         verticalMovementValue = rigidBody.velocity.y;
@@ -218,27 +225,31 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void CheckAbove() {
-        RaycastHit2D hitCeilingHigh = Physics2D.CapsuleCast(
-            new Vector2(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y + (_originalColliderSize.y / 2)),
-            _originalColliderSize,
-            CapsuleDirection2D.Vertical,
-            0f,
-            Vector2.up,
-            raycastDistance,
-            levelGeometryLayer
-        );
+        RaycastHit2D hitCeilingStanding;
+        if (bodyCollider.size == standingColliderSize && !isDucking) {
+            hitCeilingStanding = Physics2D.CapsuleCast(
+                bodyCollider.bounds.center,
+                bodyCollider.size,
+                CapsuleDirection2D.Vertical,
+                0f,
+                Vector2.up,
+                raycastDistance,
+                levelGeometryLayer
+            );
+        }
+        else{
+            hitCeilingStanding = Physics2D.CapsuleCast(
+                new Vector3(bodyCollider.bounds.center.x, bodyCollider.bounds.center.y + bodyCollider.size.y / 2, bodyCollider.bounds.center.z),
+                standingColliderSize,
+                CapsuleDirection2D.Vertical,
+                0f,
+                Vector2.up,
+                raycastDistance,
+                levelGeometryLayer
+            );
+        }
 
-        RaycastHit2D hitCeilingLow = Physics2D.CapsuleCast(
-            bodyCollider.bounds.center,
-            bodyCollider.size,
-            CapsuleDirection2D.Vertical,
-            0f,
-            Vector2.up,
-            raycastDistance,
-            levelGeometryLayer
-        );
-
-        above = hitCeilingHigh.collider || hitCeilingLow.collider ? true : false;
+        above = hitCeilingStanding.collider ? true : false;
     }
     
     private void Ducking() {
@@ -249,8 +260,8 @@ public class PlayerMovement : MonoBehaviour {
                 ExitCrouch?.Invoke(this, EventArgs.Empty);
             }
             isDucking = false;
-            if (bodyCollider.size != _originalColliderSize) {
-                bodyCollider.size = _originalColliderSize;
+            if (bodyCollider.size != standingColliderSize) {
+                bodyCollider.size = standingColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);
             }
         }
@@ -263,7 +274,7 @@ public class PlayerMovement : MonoBehaviour {
         else if (moveInput.y >= 0 && isGrounded && isDucking) {
             if(!above && !keepDucking){
                 ExitCrouch?.Invoke(this, EventArgs.Empty);
-                bodyCollider.size = _originalColliderSize;
+                bodyCollider.size = standingColliderSize;
                 bodyCollider.offset = new Vector2(0f, 0f);
                 isDucking = false;
             }

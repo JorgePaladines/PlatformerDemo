@@ -13,7 +13,7 @@ public class Enemy : MonoBehaviour {
 
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
-    public PolygonCollider2D polygonCollider;
+    public Collider2D bodyCollider;
     public CircleCollider2D damageCollider;
     private Color originalColor;
     public float invulnerabilityDuration = 0.3f;
@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour {
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        polygonCollider = GetComponent<PolygonCollider2D>();
+        bodyCollider = GetComponent<Collider2D>();
         damageCollider = GetComponent<CircleCollider2D>();
 
         groundLayer = LayerMask.GetMask("LevelGeometry");
@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour {
     }
 
     private void Start() {
-        polygonCollider.enabled = true;
+        bodyCollider.enabled = true;
         if(damageCollider != null){
             damageCollider.enabled = false;
         }
