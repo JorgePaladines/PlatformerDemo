@@ -724,17 +724,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7179428215410822986}
     m_Modifications:
+    - target: {fileID: 2467089462517422998, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
+      propertyPath: m_Size.x
+      value: 0.21568169
+      objectReference: {fileID: 0}
+    - target: {fileID: 2467089462517422998, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
+      propertyPath: m_Size.y
+      value: 0.51157224
+      objectReference: {fileID: 0}
+    - target: {fileID: 2467089462517422998, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.14215934
+      objectReference: {fileID: 0}
+    - target: {fileID: 2467089462517422998, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.12011484
+      objectReference: {fileID: 0}
     - target: {fileID: 3782781280442018544, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
       propertyPath: m_Name
       value: StompHitboxLeft
       objectReference: {fileID: 0}
     - target: {fileID: 6438197500172222930, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.20300007
+      value: -0.271
       objectReference: {fileID: 0}
     - target: {fileID: 6438197500172222930, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.50600004
+      value: -0.599
       objectReference: {fileID: 0}
     - target: {fileID: 6438197500172222930, guid: 31bcf4c2ce2a3b3448e74a842298c02d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -791,6 +807,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7179428215410822986}
     m_Modifications:
+    - target: {fileID: 4829732279882574598, guid: a68f575df29e4494aad84c8105142710, type: 3}
+      propertyPath: m_Size.x
+      value: 0.1420922
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829732279882574598, guid: a68f575df29e4494aad84c8105142710, type: 3}
+      propertyPath: m_Size.y
+      value: 0.47712874
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829732279882574598, guid: a68f575df29e4494aad84c8105142710, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.17895363
+      objectReference: {fileID: 0}
+    - target: {fileID: 4829732279882574598, guid: a68f575df29e4494aad84c8105142710, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.009504734
+      objectReference: {fileID: 0}
     - target: {fileID: 5129133858710756441, guid: a68f575df29e4494aad84c8105142710, type: 3}
       propertyPath: m_Name
       value: StompKillBox
@@ -858,17 +890,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7179428215410822986}
     m_Modifications:
+    - target: {fileID: 3945769297281230497, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
+      propertyPath: m_Size.x
+      value: 0.21568014
+      objectReference: {fileID: 0}
+    - target: {fileID: 3945769297281230497, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
+      propertyPath: m_Size.y
+      value: 0.52606213
+      objectReference: {fileID: 0}
+    - target: {fileID: 3945769297281230497, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.11217276
+      objectReference: {fileID: 0}
     - target: {fileID: 6469165886830426477, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
       propertyPath: m_Name
       value: StompHitboxRight
       objectReference: {fileID: 0}
     - target: {fileID: 8068054590498860392, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.41200018
+      value: 0.468
       objectReference: {fileID: 0}
     - target: {fileID: 8068054590498860392, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.701
+      value: -0.783
       objectReference: {fileID: 0}
     - target: {fileID: 8068054590498860392, guid: 45d331b68a66de64c9ac1b052cba3c9e, type: 3}
       propertyPath: m_LocalPosition.z

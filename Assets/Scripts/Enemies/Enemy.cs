@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour {
     public float invulnerabilityDuration = 0.3f;
     [SerializeField] Color flashColor;
     [SerializeField] ParticleSystem hitEffect;
+    private SpriteBreaker spriteBreaker;
 
     public bool facingRight;
     public bool isGrounded = false;
@@ -32,6 +33,7 @@ public class Enemy : MonoBehaviour {
         spriteRenderer = GetComponent<SpriteRenderer>();
         bodyCollider = GetComponent<Collider2D>();
         damageCollider = GetComponent<CircleCollider2D>();
+        spriteBreaker = GetComponent<SpriteBreaker>();
 
         groundLayer = LayerMask.GetMask("LevelGeometry");
         playerLayer = LayerMask.GetMask("Player");
@@ -65,11 +67,17 @@ public class Enemy : MonoBehaviour {
     }
 
     public void Die(){
-        if(this.hitEffect != null){
+        if(hitEffect != null){
             ParticleSystem instance = Instantiate(hitEffect, transform.position, Quaternion.identity);
             Destroy(instance.gameObject, instance.main.duration + instance.main.startLifetime.constantMax);
         }
-        Destroy(gameObject);
+        if(spriteBreaker != null){
+            bodyCollider.enabled = false;
+            spriteBreaker.Break();
+        }
+        else {
+            Destroy(gameObject);
+        }
     }
 
     public bool IsGrounded() {

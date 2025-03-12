@@ -61,12 +61,13 @@ public class HealthBarScript : MonoBehaviour {
         currentHealth = Mathf.Max(0, currentHealth - damage);
         healthSlider.value = currentHealth;
 
-        ShowHealthBar();
         ShowDamagePoints(damage);
 
         if (currentHealth <= 0) {
+            healthBarInstance.SetActive(false);
             enemy.Die();
         } else {
+            ShowHealthBar();
             enemy.TakeDamage();
             StartCoroutine(InvulnerabilityCoroutine());
         }

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DestructibleObject : MonoBehaviour {
-    
     private SpriteBreaker spriteBreaker;
-    private PolygonCollider2D mainCollider;
+    private Collider2D mainCollider;
     private RhythmManager rhythmManager;
     private PlayerAttack playerAttack;
     private AudioSource audioSource;
@@ -16,10 +15,11 @@ public class DestructibleObject : MonoBehaviour {
     [SerializeField] private float currentHealth;
     public float invulnerabilityDuration = 0.3f;
     private bool isInvulnerable = false;
+    private bool canTouch = true;
 
     void Start() {
         spriteBreaker = GetComponent<SpriteBreaker>();
-        mainCollider = GetComponent<PolygonCollider2D>();
+        mainCollider = GetComponent<Collider2D>();
         rhythmManager = FindAnyObjectByType<RhythmManager>();
         playerAttack = FindAnyObjectByType<PlayerAttack>();
 
@@ -33,6 +33,7 @@ public class DestructibleObject : MonoBehaviour {
         currentHealth = Mathf.Max(0, currentHealth - damage);
 
         if (currentHealth <= 0) {
+            canTouch = false;
             DestroyObject();
         } else {
             StartCoroutine(InvulnerabilityCoroutine());
@@ -76,7 +77,9 @@ public class DestructibleObject : MonoBehaviour {
                         damageAmount = hitBox.GetDamage();
                     }
                 }
-                TakeDamage(damageAmount);
+                if(canTouch){
+                    TakeDamage(damageAmount);
+                }
             }
         }
     }
