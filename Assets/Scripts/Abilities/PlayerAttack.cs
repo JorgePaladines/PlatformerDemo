@@ -48,6 +48,7 @@ public class PlayerAttack : MonoBehaviour {
 
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.clip = attackSound;
+        audioSource.playOnAwake = false;
 
         attackHitBox?.gameObject.SetActive(false);
         airHitBox?.gameObject.SetActive(false);

@@ -6,6 +6,7 @@ using System;
 
 public class DashAbility : MonoBehaviour {
     PlayerMovement player;
+    PlayerAttack playerAttack;
     Rigidbody2D rigidBody;
     private int enemyLayer;
 
@@ -24,6 +25,7 @@ public class DashAbility : MonoBehaviour {
 
     void Awake() {
         player = GetComponent<PlayerMovement>();
+        playerAttack = GetComponent<PlayerAttack>();
         rigidBody = GetComponent<Rigidbody2D>();
         enemyLayer = LayerMask.NameToLayer("Enemy");
     }
@@ -84,6 +86,7 @@ public class DashAbility : MonoBehaviour {
         Physics2D.IgnoreLayerCollision(gameObject.layer, enemyLayer, true); // Enable enemy evasion
         _dashTimer = dashCooldownTime + dashTime; // Set cooldown immediately
 
+        if(playerAttack != null) playerAttack.DisableAttack();
         player.DisableMove();
         player.DisableDuck();
         // jumpAbility?.DisableJump();
@@ -119,6 +122,7 @@ public class DashAbility : MonoBehaviour {
 
         player.EnableMove();
         player.EnableDuck();
+        if(playerAttack != null) playerAttack.EnableAttack();
         // jumpAbility?.EnableJump();
 
         yield return new WaitForSeconds(dashCooldownTime); // Wait for cooldown

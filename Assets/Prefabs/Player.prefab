@@ -402,6 +402,12 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256
+  obstableLayer:
+    serializedVersion: 2
+    m_Bits: 1024
+  destructibleLayer:
+    serializedVersion: 2
+    m_Bits: 2048
   horizontalMovementValue: 0
   verticalMovementValue: 0
   facingDirection: 0

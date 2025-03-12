@@ -21,6 +21,9 @@ public class PlayerMovement : MonoBehaviour {
     private float raycastDistance = 0.1f;
     [SerializeField] LayerMask levelGeometryLayer;
     [SerializeField] LayerMask enemyLayer;
+    [SerializeField] LayerMask obstableLayer;
+    [SerializeField] LayerMask destructibleLayer;
+
 
     #region validation properties
     public float horizontalMovementValue;
@@ -204,7 +207,7 @@ public class PlayerMovement : MonoBehaviour {
             0f, 
             Vector2.down, 
             raycastDistance/2, 
-            levelGeometryLayer | enemyLayer
+            levelGeometryLayer | enemyLayer | obstableLayer | destructibleLayer
         );
 
         Vector2 colliderCenter = bodyCollider.bounds.center;
