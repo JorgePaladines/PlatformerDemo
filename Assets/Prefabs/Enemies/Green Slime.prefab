@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2902040305203360470
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 106756788928034924}
+  m_Layer: 8
+  m_Name: CheckGroundPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &106756788928034924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2902040305203360470}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8321968316567096818}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3728630126714093273
 GameObject:
   m_ObjectHideFlags: 0
@@ -36,7 +67,8 @@ Transform:
   m_LocalPosition: {x: 19.39, y: -1.24, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 106756788928034924}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6410921393225755898
@@ -79,7 +111,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -6
   m_Sprite: {fileID: -9074539206338946419, guid: c80534141f80d28489b1ef92f8ff7d99, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -245,13 +277,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9f58528eb0aaca4dbda8942b1aca470, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  checkGroundPoint: {fileID: 2902040305203360470}
   groundRayLength: 0.1
   wallRayLength: 0.2
-  groundRayOffset: {x: 0, y: -0.5}
-  wallRayOffset: {x: 0.5, y: 0}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 8
   rb: {fileID: 0}
   spriteRenderer: {fileID: 0}
-  polygonCollider: {fileID: 0}
+  bodyCollider: {fileID: 0}
   damageCollider: {fileID: 0}
   invulnerabilityDuration: 0.3
   flashColor: {r: 0.49019608, g: 1, b: 0, a: 1}
@@ -292,7 +329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82856d3c6b1c53e418b0add093f060a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 5
+  jumpForce: 5.5
   horizontalJumpForce: 3
+  idleInterval: 2
   animator: {fileID: 8745611154118263750}
   currentState: 0

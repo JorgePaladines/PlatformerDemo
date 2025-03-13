@@ -7,7 +7,7 @@ public class SlimeMovement : MonoBehaviour {
     [SerializeField] private float jumpForce = 5f;
     [SerializeField] private float horizontalJumpForce = 3f;
     private float startTime;
-    private float idleInterval = 2f;
+    [SerializeField] [Range(0.01f, 3f)] float idleInterval;
 
     [Header("Animation")]
     [SerializeField] private Animator animator;
@@ -31,14 +31,12 @@ public class SlimeMovement : MonoBehaviour {
 
     void Update() {
         HandleStateTransitions();
+        CheckDirection();
     }
 
     private void StartMovementCycle() {
         startTime = Random.Range(0.5f, 3f);
         enemy.facingRight = Random.Range(0, 2) * 2 - 1 == 1;
-        if(!enemy.facingRight){
-            enemy.spriteRenderer.flipX = !enemy.facingRight;
-        }
         
         Invoke("startIdleCycle", startTime);
     }
@@ -98,25 +96,33 @@ public class SlimeMovement : MonoBehaviour {
         enemy.rb.velocity = new Vector2(0, enemy.rb.velocity.y);
     }
 
+    public void ForceLandingAnimation() {
+        SetState(EnemyState.Landing);
+    }
+
     private void Flip() {
         enemy.facingRight = !enemy.facingRight;
-        enemy.spriteRenderer.flipX = !enemy.facingRight;
+    }
+
+    private void CheckDirection() {
+        if(enemy.facingRight){
+            enemy.spriteRenderer.flipX = false;
+            // transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        }
+        else{
+            enemy.spriteRenderer.flipX = true;
+            // transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
         int collidedLayer = collision.gameObject.layer;
         LayerMask targetLayers = LayerMask.GetMask("Player", "LevelGeometry");
 
-        // Check if we collided with the player
-        if (targetLayers == (targetLayers | (1 << collidedLayer)) && enemy.isObstacleAhead()) {
-            // If jumping and hit player from the side, change direction
-            if (!enemy.isGrounded && enemy.isJumping) {
-                Flip();
-                
-                // Apply small backwards impulse to prevent sticking
-                int direction = enemy.facingRight ? 1 : -1;
-                enemy.rb.velocity = new Vector2(horizontalJumpForce * direction * 0.5f, enemy.rb.velocity.y);
-            }
+        if (enemy.isJumping && targetLayers == (targetLayers | (1 << collidedLayer)) && enemy.isObstacleAhead()) {
+            Flip();
+            enemy.rb.velocity = new Vector2(0f, enemy.rb.velocity.y);
+            enemy.rb.velocity = new Vector2(enemy.facingRight ? horizontalJumpForce : -horizontalJumpForce, enemy.rb.velocity.y);
         }
     }
 }
