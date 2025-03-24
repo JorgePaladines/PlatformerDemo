@@ -15,7 +15,7 @@ The player can control the character using the following inputs:
   - **Arrow Keys**: Alternative movement controls (same as WASD).
 
 - **Jumping**:
-  - **Space Key**: Jump when grounded. Double jump if available (mid-air).
+  - **Space Key**: Jump when grounded. Double jump (mid-air).
 
 - **Dashing**:
   - **Left Shift Key**: Dash in the direction the character is facing or the input direction if specified. Interrupts deceleration and can reverse direction instantly when turning.
@@ -45,8 +45,7 @@ The player can control the character using the following inputs:
 
 ### Stomping
 - Triggered by dashing downward (Down Arrow + Left Shift) mid-air.
-- Speed: `stompSpeed` downward, limited horizontal movement (`stompHorizontalSpeed` = 2f).
-- On landing, sprints at `dashSpeed` if holding horizontal input.
+- On landing, sprints if holding horizontal input.
 
 ## Advanced Mechanics
 
@@ -56,25 +55,5 @@ The player can control the character using the following inputs:
 - Sprint out of a Wall Jump by holding the input direction fast enough after Wall Jumping
 
 ### Rhythm Mechanic
-*(To be specified later)*  
-[Placeholder for rhythm-based mechanics, possibly tied to `RhythmManager.Instance.RegisterAction(false)` in `OnJump`.]
-
-## Dependencies
-- **Unity 2022**: Built with Unity’s 2D physics system.
-- **Input System**: Uses Unity’s `InputSystem` for control bindings.
-- **PlayerAttack**: Assumes a separate `PlayerAttack` script for attack logic.
-
-## Setup
-1. Attach `PlayerMovement` to a GameObject with a `Rigidbody2D` and `CapsuleCollider2D`.
-2. Optionally, attach a `PlayerAttack` script for attack functionality.
-3. Configure input bindings in Unity’s Input System settings to match the controls above.
-4. Set up layer masks (`layerMask` for ground, `enemyLayerMask` for stomp targets).
-
-## Customization
-- **Speeds**: Adjust `runSpeed`, `crouchSpeed`, `dashSpeed`, `stompSpeed`, etc., in the Unity Inspector.
-- **Deceleration**: Tune `normalDeceleration`, `sharpDeceleration`, and `minTurnThreshold` for movement feel.
-- **Cooldowns**: Modify `dashTime` and `dashCooldownTime` for dash timing.
-
-## Notes
-- The character’s facing direction (`_facingDirection`) is updated based on velocity, while dash direction can follow input (`_playerDirection`).
-- Ducking only occurs at low speeds to prevent interrupting high-speed turns unless dashing intervenes.
+- **Success**: 4 consecutive attacks or stomps at the moment the tempo is played trigger a more powerful attack
+- **Fail**: Miss the valid beat window or miss an entire beat
